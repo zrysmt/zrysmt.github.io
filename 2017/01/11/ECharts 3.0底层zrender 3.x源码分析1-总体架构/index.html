@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="zrender是一个轻量级的Canvas类库，作为百度Echarts 3.0的底层基础。截至目前查看的zrender源码和文档，包括官网文档都还停留在2.x时代，我打算用一个系列介绍下zrender 3.x的使用和源码，一些demo和没有在博客中介绍的源码请进我的github仓库。  https://github.com/zrysmt/echarts3/tree/master/zrender  基">
+<meta name="keywords" content="FE,ECharts,zrender,源码">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ECharts 3.0底层zrender 3.x源码分析1-总体架构">
+<meta property="og:url" content="https://zrysmt.github.io/2017/01/11/ECharts 3.0底层zrender 3.x源码分析1-总体架构/index.html">
+<meta property="og:site_name" content="漫漫技术路">
+<meta property="og:description" content="zrender是一个轻量级的Canvas类库，作为百度Echarts 3.0的底层基础。截至目前查看的zrender源码和文档，包括官网文档都还停留在2.x时代，我打算用一个系列介绍下zrender 3.x的使用和源码，一些demo和没有在博客中介绍的源码请进我的github仓库。  https://github.com/zrysmt/echarts3/tree/master/zrender  基">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/echarts/zrender1.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/echarts/zrender2.jpg">
+<meta property="og:updated_time" content="2018-11-30T02:55:19.467Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ECharts 3.0底层zrender 3.x源码分析1-总体架构">
+<meta name="twitter:description" content="zrender是一个轻量级的Canvas类库，作为百度Echarts 3.0的底层基础。截至目前查看的zrender源码和文档，包括官网文档都还停留在2.x时代，我打算用一个系列介绍下zrender 3.x的使用和源码，一些demo和没有在博客中介绍的源码请进我的github仓库。  https://github.com/zrysmt/echarts3/tree/master/zrender  基">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/echarts/zrender1.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="https://zrysmt.github.io/2017/01/11/ECharts 3.0底层zrender 3.x源码分析1-总体架构/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>ECharts 3.0底层zrender 3.x源码分析1-总体架构 | 漫漫技术路</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">漫漫技术路</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zrysmt.github.io/2017/01/11/ECharts 3.0底层zrender 3.x源码分析1-总体架构/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ruyi Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="漫漫技术路">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ECharts 3.0底层zrender 3.x源码分析1-总体架构
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-01-11 00:00:00" itemprop="dateCreated datePublished" datetime="2017-01-11T00:00:00+08:00">2017-01-11</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-11-30 10:55:19" itemprop="dateModified" datetime="2018-11-30T10:55:19+08:00">2018-11-30</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/前端技术/" itemprop="url" rel="index"><span itemprop="name">前端技术</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>zrender是一个轻量级的Canvas类库，作为百度<a href="http://echarts.baidu.com/index.html" target="_blank" rel="noopener">Echarts 3.0</a>的底层基础。截至目前查看的zrender源码和文档，包括官网文档都还停留在2.x时代，我打算用一个系列介绍下zrender 3.x的使用和源码，一些demo和没有在博客中介绍的源码请进我的<a href="https://github.com/zrysmt/echarts3/tree/master/zrender" target="_blank" rel="noopener">github仓库</a>。</p>
+<blockquote>
+<p><a href="https://github.com/zrysmt/echarts3/tree/master/zrender" target="_blank" rel="noopener">https://github.com/zrysmt/echarts3/tree/master/zrender</a></p>
+</blockquote>
+<p>基于版本 3.2.2。</p>
+<h1 id="1-总体架构"><a href="#1-总体架构" class="headerlink" title="1.总体架构"></a>1.总体架构</h1><p>官网上的一张图和解释。<br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/echarts/zrender1.jpg" alt=""><br><strong>MVC结构</strong>分别在Stroage.js,Painter.js,Handler.js文件下，我们稍后会详细解释，现在我们大概来看下它们分别的作用。</p>
+<ul>
+<li>Stroage(M) : shape数据CURD管理</li>
+<li>Painter(V) : canvase元素生命周期管理，视图渲染，绘画，更新控制</li>
+<li>Handler(C) : 事件交互处理，实现完整dom事件模拟封装</li>
+<li>shape : 图形实体，分而治之的图形策略，可定义扩展</li>
+<li>tool : 绘画扩展相关实用方法，工具及脚手架</li>
+<li>animation : 动画扩展，提供promise式的动画接口和常用缓动函数</li>
+</ul>
+<p><strong>源码结构</strong><br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/echarts/zrender2.jpg" alt=""><br>目录的介绍</p>
+<ul>
+<li>animation 动画有关；</li>
+<li>contain 包含判断；</li>
+<li>container Group.js 元素组的概念；</li>
+<li>core 核心代码，包含一些工具（util.js）、事件（event.js）、唯一ID(guid.js)、矩阵运算有关（matrix.js）等；</li>
+<li>dom HandleProxy.js dom事件有关；</li>
+<li>graphic 图形有关，shape文件夹下就是各个图形的js文件；</li>
+<li>mixin 混入模式要混入的函数;</li>
+<li>tool 工具函数，包括颜色工具(color.js)，path工具(path.js)和转换工具（transformPath.js）;</li>
+<li>vml IE中的画笔，[vml解释进入](<a href="http://www.g168.net/txt/vml/]" target="_blank" rel="noopener">http://www.g168.net/txt/vml/]</a></li>
+<li>全局的文件 <ul>
+<li>config.js    配置文件</li>
+<li>Element.js   元素文件作为zrender最基本的元素</li>
+<li>Handle.js    C层，控制层</li>
+<li>Layer.js     图层管理</li>
+<li>Painter.js   V层，视图层</li>
+<li>Storage.js   M层，数据管理层</li>
+<li>zrender.js   <strong>入口</strong></li>
+</ul>
+</li>
+</ul>
+<h1 id="2-入口（zrender-js）"><a href="#2-入口（zrender-js）" class="headerlink" title="2.入口（zrender.js）"></a>2.入口（zrender.js）</h1><h2 id="2-1-初始化"><a href="#2-1-初始化" class="headerlink" title="2.1 初始化"></a>2.1 初始化</h2><p>类似于jquery的无new化处理，init调用即可<br>调用：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> zr = zrender.init(<span class="built_in">document</span>.getElementById(<span class="string">'main'</span>));</span><br></pre></td></tr></table></figure></p>
+<p>源码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> instances = &#123;&#125;;    <span class="comment">// ZRender实例map索引</span></span><br><span class="line"><span class="keyword">var</span> zrender = &#123;&#125;;</span><br><span class="line">zrender.init = <span class="function"><span class="keyword">function</span>(<span class="params">dom, opts</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> zr = <span class="keyword">new</span> ZRender(guid(), dom, opts);</span><br><span class="line">    instances[zr.id] = zr;</span><br><span class="line">    <span class="keyword">return</span> zr;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<h2 id="2-2-构造函数"><a href="#2-2-构造函数" class="headerlink" title="2.2 构造函数"></a>2.2 构造函数</h2><p>我们可以在构造函数中，看到MVC的管理机制。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> ZRender = <span class="function"><span class="keyword">function</span>(<span class="params">id, dom, opts</span>) </span>&#123;</span><br><span class="line">    opts = opts || &#123;&#125;;</span><br><span class="line">    <span class="keyword">this</span>.dom = dom;</span><br><span class="line">    <span class="keyword">this</span>.id = id;</span><br><span class="line">    <span class="keyword">var</span> self = <span class="keyword">this</span>;</span><br><span class="line">    <span class="keyword">var</span> storage = <span class="keyword">new</span> Storage();</span><br><span class="line">    <span class="keyword">var</span> rendererType = opts.renderer;</span><br><span class="line">    <span class="keyword">if</span> (useVML) &#123;<span class="comment">//IE中使用VML渲染</span></span><br><span class="line">        <span class="keyword">if</span> (!painterCtors.vml) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">'You need to require \'zrender/vml/vml\' to support IE8'</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        rendererType = <span class="string">'vml'</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (!rendererType || !painterCtors[rendererType]) &#123;</span><br><span class="line">        rendererType = <span class="string">'canvas'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">var</span> painter = <span class="keyword">new</span> painterCtors[rendererType](dom, storage, opts);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">this</span>.storage = storage;<span class="comment">//M</span></span><br><span class="line">    <span class="keyword">this</span>.painter = painter;<span class="comment">//V</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> handerProxy = !env.node ? <span class="keyword">new</span> HandlerProxy(painter.getViewportRoot()) : <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">this</span>.handler = <span class="keyword">new</span> Handler(storage, painter, handerProxy, painter.root);<span class="comment">//C</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">console</span>.log(<span class="keyword">this</span>);<span class="comment">//这里是我增加的为了调试使用的</span></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * @type &#123;module:zrender/animation/Animation&#125;</span></span><br><span class="line"><span class="comment">     * 动画控制</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">this</span>.animation = <span class="keyword">new</span> Animation(&#123;</span><br><span class="line">        stage: &#123;</span><br><span class="line">            update: zrUtil.bind(<span class="keyword">this</span>.flush, <span class="keyword">this</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="keyword">this</span>.animation.start();</span><br><span class="line">    <span class="keyword">this</span>._needsRefresh;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 修改 storage.delFromMap, 每次删除元素之前删除动画</span></span><br><span class="line">    <span class="keyword">var</span> oldDelFromMap = storage.delFromMap;</span><br><span class="line">    <span class="keyword">var</span> oldAddToMap = storage.addToMap;</span><br><span class="line">    storage.delFromMap = <span class="function"><span class="keyword">function</span>(<span class="params">elId</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> el = storage.get(elId);</span><br><span class="line">        oldDelFromMap.call(storage, elId);</span><br><span class="line">        el &amp;&amp; el.removeSelfFromZr(self);</span><br><span class="line">    &#125;;</span><br><span class="line">    storage.addToMap = <span class="function"><span class="keyword">function</span>(<span class="params">el</span>) </span>&#123;</span><br><span class="line">        oldAddToMap.call(storage, el);</span><br><span class="line">        el.addSelfToZr(self);</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<h2 id="2-3-ZRender-prototype"><a href="#2-3-ZRender-prototype" class="headerlink" title="2.3 ZRender.prototype"></a>2.3 ZRender.prototype</h2><p>具体的方法及其注释可以在我的github中查看，这里只将方法名放在这里。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">ZRender.prototype = &#123;</span><br><span class="line">        <span class="keyword">constructor</span>: ZRender,</span><br><span class="line">        /**</span><br><span class="line">         * 获取实例唯一标识</span><br><span class="line">         * @return &#123;string&#125;</span><br><span class="line">         *<span class="regexp">/</span></span><br><span class="line"><span class="regexp">        getId: function () &#123;&#125;,</span></span><br><span class="line"><span class="regexp">        /</span>**</span><br><span class="line">         * 添加元素后就会渲染</span><br><span class="line">         * @param  &#123;<span class="attr">module</span>:zrender/Element&#125; el</span><br><span class="line">         *<span class="regexp">/</span></span><br><span class="line"><span class="regexp">        add: function (el) &#123;</span></span><br><span class="line"><span class="regexp">            this.storage.addRoot(el);</span></span><br><span class="line"><span class="regexp">            this._needsRefresh = true;</span></span><br><span class="line"><span class="regexp">        &#125;,</span></span><br><span class="line"><span class="regexp">        /</span>**</span><br><span class="line">         * 删除元素</span><br><span class="line">         * @param  &#123;<span class="attr">module</span>:zrender/Element&#125; el</span><br><span class="line">         *<span class="regexp">/</span></span><br><span class="line"><span class="regexp">        remove: function (el) &#123; &#125;,</span></span><br><span class="line"><span class="regexp">        configLayer: function (zLevel, config) &#123;&#125;,</span></span><br><span class="line"><span class="regexp">        /</span>** Repaint the canvas immediately*<span class="regexp">/</span></span><br><span class="line"><span class="regexp">        refreshImmediately: function () &#123;&#125;,</span></span><br><span class="line"><span class="regexp">        /</span>** Mark and repaint the canvas <span class="keyword">in</span> the next frame <span class="keyword">of</span> browser*<span class="regexp">/</span></span><br><span class="line"><span class="regexp">        refresh: function() &#123;&#125;,</span></span><br><span class="line"><span class="regexp">        flush: function () &#123;&#125;,</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp">        /</span>**Add element to hover layer *<span class="regexp">/</span></span><br><span class="line"><span class="regexp">        addHover: function (el, style) &#123;&#125;,</span></span><br><span class="line"><span class="regexp">        /</span>** Add element <span class="keyword">from</span> hover layer</span><br><span class="line">         * @param  &#123;<span class="attr">module</span>:zrender/Element&#125; el</span><br><span class="line">         *<span class="regexp">/</span></span><br><span class="line"><span class="regexp">        removeHover: function (el) &#123;&#125;,</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp">        /</span>** Clear all hover elements <span class="keyword">in</span> hover layer*<span class="regexp">/</span></span><br><span class="line"><span class="regexp">        clearHover: function () &#123;&#125;,</span></span><br><span class="line"><span class="regexp">        /</span>** Refresh hover <span class="keyword">in</span> next frame*<span class="regexp">/</span></span><br><span class="line"><span class="regexp">        refreshHover: function () &#123;&#125;,</span></span><br><span class="line"><span class="regexp">        /</span>**Refresh hover immediately*<span class="regexp">/</span></span><br><span class="line"><span class="regexp">        refreshHoverImmediately: function () &#123;     ;</span></span><br><span class="line"><span class="regexp">        &#125;,</span></span><br><span class="line"><span class="regexp">        resize: function(opts) &#123;&#125;,</span></span><br><span class="line"><span class="regexp">        clearAnimation: function () &#123;&#125;,</span></span><br><span class="line"><span class="regexp">        /</span>** Get container width *<span class="regexp">/</span></span><br><span class="line"><span class="regexp">        getWidth: function() &#123;&#125;,</span></span><br><span class="line"><span class="regexp">        getHeight: function() &#123;&#125;,</span></span><br><span class="line"><span class="regexp">        /</span>** Converting a path to image *<span class="regexp">/</span></span><br><span class="line"><span class="regexp">        pathToImage: function(e, width, height) &#123;&#125;,</span></span><br><span class="line"><span class="regexp">        /</span>**</span><br><span class="line">         * <span class="built_in">Set</span> <span class="keyword">default</span> cursor</span><br><span class="line">         * @param &#123;string&#125; [cursorStyle=<span class="string">'default'</span>] 例如 crosshair</span><br><span class="line">         *<span class="regexp">/</span></span><br><span class="line"><span class="regexp">        setCursorStyle: function (cursorStyle) &#123;&#125;,</span></span><br><span class="line"><span class="regexp">        /</span>**发布订阅模式 *<span class="regexp">/</span></span><br><span class="line"><span class="regexp">        on: function(eventName, eventHandler, context) &#123;&#125;,</span></span><br><span class="line"><span class="regexp">        off: function(eventName, eventHandler) &#123;&#125;,</span></span><br><span class="line"><span class="regexp">        trigger: function (eventName, event) &#123;&#125;,</span></span><br><span class="line"><span class="regexp">        /</span>** Clear all objects and the canvas *<span class="regexp">/</span></span><br><span class="line"><span class="regexp">        clear: function () &#123;&#125;,</span></span><br><span class="line"><span class="regexp">        /</span>** Dispose self *<span class="regexp">/</span></span><br><span class="line"><span class="regexp">        dispose: function () &#123;&#125;</span></span><br><span class="line"><span class="regexp">    &#125;;</span></span><br></pre></td></tr></table></figure></p>
+<p>源码的方法，我们以<code>add</code>举例子，它其实调用的是<code>this.storage.addRoot</code>方法,使用MVC机制处理。<br>使用示例：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> circle1 = <span class="keyword">new</span> Circle(&#123;</span><br><span class="line">    shape: &#123;</span><br><span class="line">        cx: <span class="number">100</span>,</span><br><span class="line">        cy: <span class="number">100</span>,</span><br><span class="line">        r: <span class="number">30</span></span><br><span class="line">    &#125;,</span><br><span class="line">    style: &#123;</span><br><span class="line">        fill: <span class="string">'blue'</span></span><br><span class="line">    &#125;,</span><br><span class="line">    draggable: <span class="literal">true</span></span><br><span class="line">&#125;);</span><br><span class="line">zr.add(circle1);</span><br><span class="line">circle1.on(<span class="string">'mouseover'</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    zr.addHover(<span class="keyword">this</span>, &#123;</span><br><span class="line">        stroke: <span class="string">'yellow'</span>,</span><br><span class="line">        lineWidth: <span class="number">10</span>,</span><br><span class="line">        opacity: <span class="number">1</span></span><br><span class="line">    &#125;);</span><br><span class="line">    zr.refresh();</span><br><span class="line">&#125;);</span><br><span class="line">circle1.on(<span class="string">'mouseout'</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    zr.removeHover(<span class="keyword">this</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<p>注意：这里有<code>addHover</code>方法，所以会渲染两个canvas。如果没有addHover，就只会渲染一个canvas。</p>
+<h1 id="3-MVC简单概述"><a href="#3-MVC简单概述" class="headerlink" title="3.MVC简单概述"></a>3.MVC简单概述</h1><p>MVC对应三个文件的结构很简单，其实就是一个构造函数，一个prototype原型扩展。</p>
+<h2 id="3-1-M–数据管理层-Storage-js）"><a href="#3-1-M–数据管理层-Storage-js）" class="headerlink" title="3.1 M–数据管理层(Storage.js）"></a>3.1 M–数据管理层(Storage.js）</h2><p>我们看构造函数，将元素存储在this._elements(对象)、this._roots（数组）和this._displayList（数组）中，然后负责在其中进行增（addRoot，addToMap）删(delRoot,delFromMap)改（updateDisplayList）查（get，getDisplayList）。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> Storage = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">     <span class="comment">// 所有常规形状，id索引的map</span></span><br><span class="line">     <span class="keyword">this</span>._elements = &#123;&#125;;</span><br><span class="line">     <span class="comment">//和this._elements存放的元素一样，只不过是数组</span></span><br><span class="line">     <span class="keyword">this</span>._roots = [];</span><br><span class="line">     <span class="comment">//和this.roots一样</span></span><br><span class="line">     <span class="keyword">this</span>._displayList = [];</span><br><span class="line">     <span class="comment">//this._displayList的长度</span></span><br><span class="line">     <span class="keyword">this</span>._displayListLen = <span class="number">0</span>;</span><br><span class="line"> &#125;;</span><br></pre></td></tr></table></figure></p>
+<h2 id="3-2-C–控制层（Handle-js）"><a href="#3-2-C–控制层（Handle-js）" class="headerlink" title="3.2 C–控制层（Handle.js）"></a>3.2 C–控制层（Handle.js）</h2><p>Handler负责事件处理,包括’click’, ‘dblclick’, ‘mousewheel’, ‘mouseout’,        ‘mouseup’, ‘mousedown’, ‘mousemove’, ‘contextmenu’等。我们知道canvas API没有提供监听每个元素的机制，这就需要一些处理。处理的思路是：监听事件的作用坐标（如点击时候的坐标），判断在哪个绘制元素的范围中，如果在某个元素中，这个元素就监听该事件。具体的思路可以查看参考阅读给的链接文章。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Handler.prototype = &#123;</span><br><span class="line">    mousemove：<span class="function"><span class="keyword">function</span> (<span class="params">event</span>)</span>&#123;&#125;<span class="comment">//... ...</span></span><br><span class="line">&#125;</span><br><span class="line">util.mixin(Handler, Eventful);<span class="comment">//混入，下面我们会解释到</span></span><br><span class="line">util.mixin(Handler, Draggable);</span><br></pre></td></tr></table></figure>
+<h2 id="3-3-V–视图层（Painter-js）"><a href="#3-3-V–视图层（Painter-js）" class="headerlink" title="3.3 V–视图层（Painter.js）"></a>3.3 V–视图层（Painter.js）</h2><p>Painter负责真正的绘图操作，这里是比较繁重的部分</p>
+<ul>
+<li>1.负责canvas及其周边DOM元素的创建与处理</li>
+<li>2.负责调用各个Shape（预定义好的）进行绘制</li>
+<li>3.提供基本的操作方法，渲染(render)、刷新(refresh)、尺寸变化(resize)、擦除(clear)等</li>
+</ul>
+<p>Painter是调用canvas API实现的绘制,包括颜色，渐变色，变换，矩阵变化，绘制图片、文本等。IE8使用<a href="https://code.google.com/p/explorercanvas/" target="_blank" rel="noopener">excanvas</a>兼容。</p>
+<h1 id="4-设计模式总结"><a href="#4-设计模式总结" class="headerlink" title="4.设计模式总结"></a>4.设计模式总结</h1><p>设计模式的总结，我在一篇<a href="http://blog.csdn.net/future_todo/article/details/53992141" target="_blank" rel="noopener">博客</a>中有写,要想看这方面的知识，可以在这里看。</p>
+<h2 id="4-1-AMD模式"><a href="#4-1-AMD模式" class="headerlink" title="4.1 AMD模式"></a>4.1 AMD模式</h2><p>AMD即是“异步模块定义”的意思，所有依赖这个模块的语句，都定义在一个回调函数中，等到加载完成之后，这个回调函数才会运行。源码的结构是这样的</p>
+<ul>
+<li>定义</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">define(<span class="function"><span class="keyword">function</span>(<span class="params">require</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> ZRender;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">require</span>([<span class="built_in">module</span>], callback);</span><br></pre></td></tr></table></figure>
+<p>我们的Demo使用的是百度封装好的AMD模式esl.js(或者使用requirejs也可以),引入方式和使用示例如下：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"../libs/esl.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">require</span>([<span class="string">'zrender'</span>, <span class="string">'zrender/graphic/shape/Circle'</span>, <span class="string">'zrender/graphic/shape/Polygon'</span>],</span><br><span class="line"><span class="function"><span class="keyword">function</span>(<span class="params">zrender, Circle, Polygon</span>) </span>&#123; <span class="comment">//... ...</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h2 id="4-2-继承"><a href="#4-2-继承" class="headerlink" title="4.2 继承"></a>4.2 继承</h2><p>在core-&gt;util.js，主要的思想就是将子类的prototype指向父类的prototype；子类的构造函数指向自己。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">inherits</span>(<span class="params">clazz, baseClazz</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> clazzPrototype = clazz.prototype;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">F</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">    F.prototype = baseClazz.prototype;</span><br><span class="line">    clazz.prototype = <span class="keyword">new</span> F();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> prop <span class="keyword">in</span> clazzPrototype) &#123;<span class="comment">//属性也继承了</span></span><br><span class="line">        clazz.prototype[prop] = clazzPrototype[prop];</span><br><span class="line">    &#125;</span><br><span class="line">    clazz.prototype.constructor = clazz;</span><br><span class="line">    clazz.superClass = baseClazz;<span class="comment">//superClass是个自己定义的属性</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>另外不要忘了，在构造函数中应该重写父类的属性。例如：Displayable的父类是Element:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Displayable</span>(<span class="params">opts</span>) </span>&#123;</span><br><span class="line">     Element.call(<span class="keyword">this</span>, opts);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>实现继承：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">zrUtil.inherits(Displayable, Element);</span><br></pre></td></tr></table></figure></p>
+<h2 id="4-3-混入模式"><a href="#4-3-混入模式" class="headerlink" title="4.3 混入模式"></a>4.3 混入模式</h2><p>简而言之，混入就是将一个对象的方法复制给另外一个对象。实现在util.js中<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">mixin</span>(<span class="params">target, source, overlay</span>) </span>&#123;</span><br><span class="line">   target = <span class="string">'prototype'</span> <span class="keyword">in</span> target ? target.prototype : target;</span><br><span class="line">   source = <span class="string">'prototype'</span> <span class="keyword">in</span> source ? source.prototype : source;</span><br><span class="line">   defaults(target, source, overlay);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">defaults</span>(<span class="params">target, source, overlay</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> key <span class="keyword">in</span> source) &#123;</span><br><span class="line">        <span class="keyword">if</span> (source.hasOwnProperty(key) &amp;&amp; (overlay ? source[key] != <span class="literal">null</span> : target[key] == <span class="literal">null</span>)) &#123;</span><br><span class="line">            target[key] = source[key];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> target;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>调用<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">zrUtil.mixin(Displayable, RectText);</span><br></pre></td></tr></table></figure></p>
+<h2 id="4-4-jquery的extend模式"><a href="#4-4-jquery的extend模式" class="headerlink" title="4.4 jquery的extend模式"></a>4.4 jquery的extend模式</h2><p>实现很简单，类似混入模式,将source对象的方法复制给target对象。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">extend</span>(<span class="params">target, source</span>) </span>&#123;</span><br><span class="line">     <span class="keyword">for</span> (<span class="keyword">var</span> key <span class="keyword">in</span> source) &#123;</span><br><span class="line">         <span class="keyword">if</span> (source.hasOwnProperty(key)) &#123;</span><br><span class="line">             target[key] = source[key];</span><br><span class="line">         &#125;</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="keyword">return</span> target;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="4-5-发布订阅模式"><a href="#4-5-发布订阅模式" class="headerlink" title="4.5 发布订阅模式"></a>4.5 发布订阅模式</h2><p>逻辑在mixin文件夹中的Eventful.js，为Handle(handle.js)混入方法<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">util.mixin(Handler, Eventful);</span><br></pre></td></tr></table></figure></p>
+<p>包括一下几种方法</p>
+<ul>
+<li><code>one</code>一次绑定事件</li>
+<li><code>on</code> 绑定事件</li>
+<li><code>isSilent</code>是否绑定了事件</li>
+<li><code>off</code>解绑事件</li>
+<li><code>trigger</code>事件分发，触发事件</li>
+<li><code>triggerWithContext</code>带有context的事件分发</li>
+</ul>
+<h1 id="5-逻辑关系"><a href="#5-逻辑关系" class="headerlink" title="5.逻辑关系"></a>5.逻辑关系</h1><ul>
+<li>步进关系</li>
+</ul>
+<p>说明：–&gt;为扩展或混入，==&gt;为继承自父类，（）内部为所在位置, [ ]为扩展或者混入的方式。</p>
+<p><code>Element</code>[Animatable Transformable Eventful] (Element.js) ==&gt;<br><code>Displayable</code>[ReactText] (Displayable.js) ==&gt;<br><code>Path</code>[Sub] (Path.js) ==&gt;<br><code>Sub</code>(Path.js) –&gt;<br><code>各类型的shape</code></p>
+<p>底层对象是封装过的Element。</p>
+<ul>
+<li>绘制的逻辑</li>
+</ul>
+<p><code>add</code>（zrender.js）–&gt;<code>addRoot</code>(Storage.js) –&gt; <code>addToMap</code>(Storage.js) –&gt;<br><code>dirty</code>[标记为脏的，下一帧渲染] (path.js) –&gt; <code>refresh</code>(Painter.js)–&gt;<code>_paintList</code>[遍历_displayList] (Painter.js)–&gt;<br><code>_doPaintEl</code>[渲染单个元素] Painter.js) –&gt;<code>brush</code>(Path.js)–&gt;<code>buildPath</code> (各个类型的shape)</p>
+<p><strong>参考阅读：</strong></p>
+<ul>
+<li><a href="http://ecomfe.github.io/zrender/" target="_blank" rel="noopener">zrender官方网站</a></li>
+<li><a href="http://www.g168.net/txt/vml/],相当于IE里面的画笔，能实现你所想要的图形，而且结合脚本，可以让图形产生动态的效" target="_blank" rel="noopener">vml解释</a></li>
+<li><a href="http://www.cnblogs.com/hhstuhacker/category/603743.html" target="_blank" rel="noopener">ZRender源码分析系列</a></li>
+<li><a href="https://github.com/lonelyclick/nts/tree/master/zrender/src" target="_blank" rel="noopener">ZRender源码分析系列源码注释</a></li>
+<li><a href="http://blog.csdn.net/vuturn/article/details/45822905" target="_blank" rel="noopener">HTML5 Canvas绘制的图形的事件处理</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/FE/" rel="tag"># FE</a>
+          
+            <a href="/tags/ECharts/" rel="tag"># ECharts</a>
+          
+            <a href="/tags/zrender/" rel="tag"># zrender</a>
+          
+            <a href="/tags/源码/" rel="tag"># 源码</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/01/03/javascript设计模式【下】/" rel="next" title="javascript设计模式【下】">
+                <i class="fa fa-chevron-left"></i> javascript设计模式【下】
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/01/11/ECharts 3.0底层zrender 3.x源码分析3-Handler（C层）/" rel="prev" title="ECharts 3.0底层zrender 3.x源码分析3-Handler（C层）">
+                ECharts 3.0底层zrender 3.x源码分析3-Handler（C层） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ruyi Zhao</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">70</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">52</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-总体架构"><span class="nav-number">1.</span> <span class="nav-text">1.总体架构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-入口（zrender-js）"><span class="nav-number">2.</span> <span class="nav-text">2.入口（zrender.js）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-初始化"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 初始化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-构造函数"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 构造函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-ZRender-prototype"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 ZRender.prototype</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-MVC简单概述"><span class="nav-number">3.</span> <span class="nav-text">3.MVC简单概述</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-M–数据管理层-Storage-js）"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 M–数据管理层(Storage.js）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-C–控制层（Handle-js）"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 C–控制层（Handle.js）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-V–视图层（Painter-js）"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 V–视图层（Painter.js）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-设计模式总结"><span class="nav-number">4.</span> <span class="nav-text">4.设计模式总结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-AMD模式"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 AMD模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-继承"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 继承</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-3-混入模式"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 混入模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-4-jquery的extend模式"><span class="nav-number">4.4.</span> <span class="nav-text">4.4 jquery的extend模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-5-发布订阅模式"><span class="nav-number">4.5.</span> <span class="nav-text">4.5 发布订阅模式</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-逻辑关系"><span class="nav-number">5.</span> <span class="nav-text">5.逻辑关系</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ruyi Zhao</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

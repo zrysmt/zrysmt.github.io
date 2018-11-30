@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="最近尝试了很多次，看到网上的很多教程都是版本比较老旧，会出现很多问题。经过数天的实践，现在可以调用成功，遂将步骤记录在此。为避免以后使用的软件不兼容，首先给出基于window 10的软件版本：  MapServer服务器  3.2.1 ms4w-3.2.1-setup.exe   http://www.ms4w.com/   QGIS 2.18 osgeo4w-setup-x86_64.exe">
+<meta name="keywords" content="FE,OpenLayers 3,WebGIS,leaflet,MapServer">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用leaflet或者openlayers 3 调用MapServer服务最佳实践完整说明">
+<meta property="og:url" content="https://zrysmt.github.io/2017/05/04/使用leaflet或者openlayers-3-调用MapServer服务最佳实践完整说明/index.html">
+<meta property="og:site_name" content="漫漫技术路">
+<meta property="og:description" content="最近尝试了很多次，看到网上的很多教程都是版本比较老旧，会出现很多问题。经过数天的实践，现在可以调用成功，遂将步骤记录在此。为避免以后使用的软件不兼容，首先给出基于window 10的软件版本：  MapServer服务器  3.2.1 ms4w-3.2.1-setup.exe   http://www.ms4w.com/   QGIS 2.18 osgeo4w-setup-x86_64.exe">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/mapserver/1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/mapserver/2-1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/mapserver/2-2.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/mapserver/2-3.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/mapserver/2-4.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/mapserver/2-5.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/mapserver/3-1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/mapserver/3-2.png">
+<meta property="og:updated_time" content="2018-11-30T02:40:53.166Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用leaflet或者openlayers 3 调用MapServer服务最佳实践完整说明">
+<meta name="twitter:description" content="最近尝试了很多次，看到网上的很多教程都是版本比较老旧，会出现很多问题。经过数天的实践，现在可以调用成功，遂将步骤记录在此。为避免以后使用的软件不兼容，首先给出基于window 10的软件版本：  MapServer服务器  3.2.1 ms4w-3.2.1-setup.exe   http://www.ms4w.com/   QGIS 2.18 osgeo4w-setup-x86_64.exe">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/mapserver/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="https://zrysmt.github.io/2017/05/04/使用leaflet或者openlayers-3-调用MapServer服务最佳实践完整说明/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>使用leaflet或者openlayers 3 调用MapServer服务最佳实践完整说明 | 漫漫技术路</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">漫漫技术路</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zrysmt.github.io/2017/05/04/使用leaflet或者openlayers-3-调用MapServer服务最佳实践完整说明/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ruyi Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="漫漫技术路">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">使用leaflet或者openlayers 3 调用MapServer服务最佳实践完整说明
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-05-04 20:36:48" itemprop="dateCreated datePublished" datetime="2017-05-04T20:36:48+08:00">2017-05-04</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-11-30 10:40:53" itemprop="dateModified" datetime="2018-11-30T10:40:53+08:00">2018-11-30</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/WebGIS/" itemprop="url" rel="index"><span itemprop="name">WebGIS</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近尝试了很多次，看到网上的很多教程都是版本比较老旧，会出现很多问题。经过数天的实践，现在可以调用成功，遂将步骤记录在此。<br>为避免以后使用的软件不兼容，首先给出基于window 10的软件版本：</p>
+<ul>
+<li>MapServer服务器  3.2.1 <a href="http://www.ms4w.com/release/ms4w-3.2.1-setup.exe" target="_blank" rel="noopener">ms4w-3.2.1-setup.exe</a></li>
+</ul>
+<blockquote>
+<p><a href="http://www.ms4w.com/" target="_blank" rel="noopener">http://www.ms4w.com/</a></p>
+</blockquote>
+<ul>
+<li>QGIS 2.18 <a href="http://www.qgis.org/en/site/forusers/download.html" target="_blank" rel="noopener">osgeo4w-setup-x86_64.exe</a></li>
+</ul>
+<blockquote>
+<p><a href="http://www.qgis.org/en/site/forusers/download.html" target="_blank" rel="noopener">http://www.qgis.org/en/site/forusers/download.html</a></p>
+</blockquote>
+<hr>
+<p>所有配置和示例我都放在了github仓库中<a href="https://github.com/zrysmt/mapserver-leaflet-openlayers" target="_blank" rel="noopener">mapserver-leaflet-openlayers</a>。</p>
+<blockquote>
+<p><a href="https://github.com/zrysmt/mapserver-leaflet-openlayers" target="_blank" rel="noopener">https://github.com/zrysmt/mapserver-leaflet-openlayers</a></p>
+</blockquote>
+<h1 id="1-安装说明"><a href="#1-安装说明" class="headerlink" title="1.安装说明"></a>1.安装说明</h1><h2 id="1-1-ms4w-3-2-1-setup-exe"><a href="#1-1-ms4w-3-2-1-setup-exe" class="headerlink" title="1.1 ms4w-3.2.1-setup.exe"></a>1.1 ms4w-3.2.1-setup.exe</h2><p>Windows平台MapServer （MS4W）安装<a href="http://mapserver.org/de/introduction.html" target="_blank" rel="noopener">Windows平台MapServer （MS4W）安装</a></p>
+<blockquote>
+<p><a href="http://blog.csdn.net/u010924834/article/details/53434322" target="_blank" rel="noopener">http://blog.csdn.net/u010924834/article/details/53434322</a><br><a href="http://mapserver.org/de/introduction.html" target="_blank" rel="noopener">http://mapserver.org/de/introduction.html</a></p>
+</blockquote>
+<p>MapServer的安装包（ms4w.zip,解压到根目录下）里内置了<strong>Apache</strong>，不过因为IIS占用了80的端口，所以需要设置下端口 （在\ms4w\Apache\conf\ httpd.conf中，将Listen 80改为Listen 8081）</p>
+<h2 id="1-2-osgeo4w-setup-x86-64-exe"><a href="#1-2-osgeo4w-setup-x86-64-exe" class="headerlink" title="1.2 osgeo4w-setup-x86_64.exe"></a>1.2 osgeo4w-setup-x86_64.exe</h2><p>因为刚开始值安装了Destop桌面端，后来出了问题，无奈废了很大的劲又卸载了重新安装的。这里建议全部安装，选择<code>Advanced Install</code> 点击选择全部安装即可。</p>
+<h2 id="1-3-QGIS几个重要的插件"><a href="#1-3-QGIS几个重要的插件" class="headerlink" title="1.3 QGIS几个重要的插件"></a>1.3 QGIS几个重要的插件</h2><p>安装插件<br>qGIS菜单栏plugin–&gt;Manager and Install Plugin<br><strong>1.qgis2web</strong><br>会导出一个完整的网页结构<br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/mapserver/1.png" alt=""><br>【Update perview】可以更换坐标系<br>【Export】导出即可</p>
+<p>导出后会打开一个网页，我们需要的是data文件夹下的js，里面有geoJson数据</p>
+<p><strong>2.RT Mapfile Export</strong><br>这是我们发布地图服务的重要的插件</p>
+<p>使用插件的时候注意先设置好，打开<code>Manager and Install Plugin</code>对话框，注意在设置中勾选住实验性的插件一项，再搜索插件并进行安装。</p>
+<h1 id="2-发布服务"><a href="#2-发布服务" class="headerlink" title="2.发布服务"></a>2.发布服务</h1><p>安装好<code>RT Mapfile Export</code>插件后，我们就可以使用QGIS导出Mapfile文件用来发布服务了。<br><strong>坐标系</strong><br>首先重要的一点是坐标系一定要选择好。如果不满足，可以使用QGIS工具<code>Reproject Layer</code>转换坐标系。目前常用的是EPSG：3857 墨卡托坐标系和EPSG：4326 WGS84坐标系，这里我们就以3857坐标系为例。</p>
+<p><strong>MapFile</strong><br>在发布服务方面，MapServer有一个和mxd（ArcGIS）类似的map文件来描述地图的图层及样式，不同的是，在使用地图服务的时候，调用的url中需要知道map文件的位置，而ArcGIS则不需要</p>
+<p>关于MapFile,这里就不单独介绍太多，Mapfile的作用如下图所示。<br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/mapserver/2-1.png" alt=""><br>基本介绍：<br><a href="http://blog.csdn.net/qingyafan/article/details/46500127" target="_blank" rel="noopener">http://blog.csdn.net/qingyafan/article/details/46500127</a><br>MapServer 快速入门文档：<br><a href="http://live.osgeo.org/zh/quickstart/mapserver_quickstart.html" target="_blank" rel="noopener">http://live.osgeo.org/zh/quickstart/mapserver_quickstart.html</a></p>
+<p><strong>发布过程</strong><br>因为我把发布的服务器端口改为8000了，所以<code>Online resource url</code>地址是<code>http://127.0.0.1:8000/cgi-bin/mapserv.exe</code><br>1.<br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/mapserver/2-2.png" alt=""><br>2.<br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/mapserver/2-3.png" alt=""><br>3.<br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/mapserver/2-4.png" alt=""><br>【确定】即可生成mapfile文件，在本文末尾会给出.<br>mapfile文件地址在<code>E:\ms4w\apps\worldmap</code>中。<br>我们在浏览器中输入地址<code>http://127.0.0.1:8000/cgi-bin/mapserv.exe?MAP=E:/ms4w/apps/worldmap/world3857.map&amp;LAYERS=World_region&amp;MODE=MAP</code><br><strong>注意:</strong>在使用类库调用该WMS服务的时候一定要去掉<code>&amp;MODE=MAP</code>,否则不能成功。<br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/mapserver/2-5.png" alt=""></p>
+<h1 id="3-使用leaflet或openlayers调用"><a href="#3-使用leaflet或openlayers调用" class="headerlink" title="3.使用leaflet或openlayers调用"></a>3.使用leaflet或openlayers调用</h1><p>leaflet示例如下：<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>leaflet加载MapServer示例子<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- &lt;link rel="stylesheet" href="../app/common/css/leaflet.css"&gt; --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span> <span class="attr">href</span>=<span class="string">"https://cdn.bootcss.com/leaflet/1.0.3/leaflet.css"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">style</span> <span class="attr">type</span>=<span class="string">"text/css"</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="css">    <span class="selector-id">#map</span> &#123;</span></span><br><span class="line"><span class="undefined">        width: 100%;</span></span><br><span class="line"><span class="undefined">        height: 600px;</span></span><br><span class="line"><span class="undefined">    &#125;</span></span><br><span class="line"><span class="undefined">    </span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"map"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://cdn.bootcss.com/leaflet/1.0.3/leaflet-src.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- &lt;script src="../app/common/leaflet-plugin/leaflet-src.js"&gt;&lt;/script&gt; --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> map = L.map(<span class="string">'map'</span>, &#123;</span></span><br><span class="line"><span class="undefined">        crs: L.CRS.EPSG3857</span></span><br><span class="line"><span class="undefined">    &#125;);</span></span><br><span class="line"><span class="undefined">    map.setView([30, 104], 2);</span></span><br><span class="line"><span class="javascript">    <span class="comment">// let map = L.map('map').setView([30, 104], 10); //默认墨卡托投影 ESPG：3857</span></span></span><br><span class="line"><span class="javascript">    <span class="comment">//http://127.0.0.1:8000/cgi-bin/mapserv.exe?MAP=E:/ms4w/apps/test/test.map&amp;LAYERS=ALL&amp;MODE=MAP</span></span></span><br><span class="line"><span class="javascript">    <span class="comment">//一定不要有&amp;MODE=MAP</span></span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> myDemo = L.tileLayer.wms(<span class="string">"http://127.0.0.1:8000/cgi-bin/mapserv.exe?MAP=E:/ms4w/apps/worldmap/world3857.map"</span>, &#123;</span></span><br><span class="line"><span class="javascript">        layers: <span class="string">'World_region'</span>,</span></span><br><span class="line"><span class="javascript">        format: <span class="string">'image/png'</span>,</span></span><br><span class="line"><span class="javascript">        transparent: <span class="literal">false</span>,</span></span><br><span class="line"><span class="undefined">        crs: L.CRS.EPSG3857,</span></span><br><span class="line"><span class="javascript">        attribution: <span class="string">"自定义地图"</span>,</span></span><br><span class="line"><span class="undefined">    &#125;);</span></span><br><span class="line"><span class="undefined"></span></span><br><span class="line"><span class="undefined">    myDemo.addTo(map);</span></span><br><span class="line"><span class="undefined">    </span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>访问示例如下：<br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/mapserver/3-1.png" alt=""><br>openlayers示例如下：<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>openlayers 3加载MapServer示例子<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">link</span> <span class="attr">rel</span>=<span class="string">"stylesheet"</span> <span class="attr">href</span>=<span class="string">"https://openlayers.org/en/v4.1.1/css/ol.css"</span> <span class="attr">type</span>=<span class="string">"text/css"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">style</span> <span class="attr">type</span>=<span class="string">"text/css"</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="css">    <span class="selector-id">#map</span> &#123;</span></span><br><span class="line"><span class="undefined">        width: 100%;</span></span><br><span class="line"><span class="undefined">        height: 600px;</span></span><br><span class="line"><span class="undefined">    &#125;</span></span><br><span class="line"><span class="undefined">    </span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"map"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"https://openlayers.org/en/v4.1.1/build/ol.js"</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">"text/javascript"</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> layers = [</span></span><br><span class="line"><span class="javascript">        <span class="keyword">new</span> ol.layer.Tile(&#123;</span></span><br><span class="line"><span class="javascript">            source: <span class="keyword">new</span> ol.source.OSM()</span></span><br><span class="line"><span class="undefined">        &#125;),</span></span><br><span class="line"><span class="javascript">        <span class="keyword">new</span> ol.layer.Tile(&#123;</span></span><br><span class="line"><span class="javascript">            source: <span class="keyword">new</span> ol.source.TileWMS(&#123;</span></span><br><span class="line"><span class="javascript">                url: <span class="string">'http://127.0.0.1:8000/cgi-bin/mapserv.exe'</span>,</span></span><br><span class="line"><span class="undefined">                params: &#123;</span></span><br><span class="line"><span class="javascript">                    <span class="string">'layers'</span>: <span class="string">'World_region'</span>,</span></span><br><span class="line"><span class="javascript">                    <span class="string">'MAP'</span>: <span class="string">"E:/ms4w/apps/worldmap/world3857.map"</span>,</span></span><br><span class="line"><span class="javascript">                    <span class="string">'TILED'</span>: <span class="literal">true</span></span></span><br><span class="line"><span class="undefined">                &#125;,</span></span><br><span class="line"><span class="javascript">                serverType: <span class="string">'mapserver'</span>,</span></span><br><span class="line"><span class="undefined">            &#125;)</span></span><br><span class="line"><span class="undefined">        &#125;)</span></span><br><span class="line"><span class="undefined">    ];</span></span><br><span class="line"><span class="javascript">    <span class="keyword">var</span> map = <span class="keyword">new</span> ol.Map(&#123;</span></span><br><span class="line"><span class="javascript">        target: <span class="string">'map'</span>,</span></span><br><span class="line"><span class="undefined">        layers: layers,</span></span><br><span class="line"><span class="javascript">        view: <span class="keyword">new</span> ol.View(&#123;</span></span><br><span class="line"><span class="undefined">            center: ol.proj.fromLonLat([104, 30]),</span></span><br><span class="line"><span class="undefined">            zoom: 2,</span></span><br><span class="line"><span class="javascript">            projection: <span class="string">'EPSG:3857'</span></span></span><br><span class="line"><span class="undefined">        &#125;)</span></span><br><span class="line"><span class="undefined">    &#125;);</span></span><br><span class="line"><span class="undefined">    </span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>访问示例如下：<br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/mapserver/3-2.png" alt=""></p>
+<h1 id="4-附录：mapfile文件world3857-map"><a href="#4-附录：mapfile文件world3857-map" class="headerlink" title="4.附录：mapfile文件world3857.map"></a>4.附录：mapfile文件world3857.map</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br></pre></td><td class="code"><pre><span class="line">MAP</span><br><span class="line">  FONTSET &quot;E:/ms4w/apps/etc/fonts.txt&quot;</span><br><span class="line">  EXTENT -179.99942 -59.484295 180 83.627357</span><br><span class="line">  IMAGETYPE &quot;png&quot;</span><br><span class="line">  NAME &quot;QGIS--MAP&quot;</span><br><span class="line">  SHAPEPATH &quot;E:/ms4w/apps/data/worldmap3857&quot;</span><br><span class="line">  SIZE 800 800</span><br><span class="line">  STATUS ON</span><br><span class="line">  UNITS DD</span><br><span class="line"></span><br><span class="line">  OUTPUTFORMAT</span><br><span class="line">    NAME &quot;png&quot;</span><br><span class="line">    MIMETYPE &quot;image/png&quot;</span><br><span class="line">    DRIVER &quot;AGG/PNG&quot;</span><br><span class="line">    EXTENSION &quot;png&quot;</span><br><span class="line">    IMAGEMODE RGB</span><br><span class="line">    TRANSPARENT FALSE</span><br><span class="line">  END # OUTPUTFORMAT</span><br><span class="line"></span><br><span class="line">  PROJECTION</span><br><span class="line">    &quot;proj=longlat&quot;</span><br><span class="line">    &quot;datum=WGS84&quot;</span><br><span class="line">    &quot;no_defs&quot;</span><br><span class="line">    &quot;init=epsg:3857&quot;</span><br><span class="line">  END # PROJECTION</span><br><span class="line">  LEGEND</span><br><span class="line">    KEYSIZE 20 20</span><br><span class="line">    KEYSPACING 5 5</span><br><span class="line">    LABEL</span><br><span class="line">      SIZE MEDIUM</span><br><span class="line">      OFFSET 0 0</span><br><span class="line">      SHADOWSIZE 1 1</span><br><span class="line">      TYPE BITMAP</span><br><span class="line">    END # LABEL</span><br><span class="line">    STATUS OFF</span><br><span class="line">  END # LEGEND</span><br><span class="line"></span><br><span class="line">  QUERYMAP</span><br><span class="line">    SIZE -1 -1</span><br><span class="line">    STATUS OFF</span><br><span class="line">    STYLE HILITE</span><br><span class="line">  END # QUERYMAP</span><br><span class="line"></span><br><span class="line">  SCALEBAR</span><br><span class="line">    INTERVALS 4</span><br><span class="line">    LABEL</span><br><span class="line">      SIZE MEDIUM</span><br><span class="line">      OFFSET 0 0</span><br><span class="line">      SHADOWSIZE 1 1</span><br><span class="line">      TYPE BITMAP</span><br><span class="line">    END # LABEL</span><br><span class="line">    SIZE 200 3</span><br><span class="line">    STATUS OFF</span><br><span class="line">    UNITS MILES</span><br><span class="line">  END # SCALEBAR</span><br><span class="line"></span><br><span class="line">  WEB</span><br><span class="line">    FOOTER &quot;&quot;</span><br><span class="line">    HEADER &quot;&quot;</span><br><span class="line">    IMAGEPATH &quot;E:/ms4w/tmp/ms_tmp/&quot;</span><br><span class="line">    TEMPPATH &quot;E:/ms4w/tmp/&quot;</span><br><span class="line">    IMAGEURL &quot;/tmp/&quot;</span><br><span class="line">    METADATA</span><br><span class="line">      &quot;wms_onlineresource&quot; &quot;http://127.0.0.1:8000/cgi-bin/mapserv.exe?map=E:/ms4w/apps/test2/test2.map&quot;</span><br><span class="line">      &quot;wms_enable_request&quot; &quot;*&quot;</span><br><span class="line">      &quot;wms_srs&quot; &quot;EPSG:3857&quot;</span><br><span class="line">      &quot;wms_feature_info_mime_type&quot; &quot;text/html&quot;</span><br><span class="line">      &quot;wms_format&quot; &quot;image/png&quot;</span><br><span class="line">    END # METADATA</span><br><span class="line">    TEMPLATE &quot;E:/ms4w/apps/test2/test.map.html.tmpl&quot;</span><br><span class="line">  END # WEB</span><br><span class="line"></span><br><span class="line">  LAYER</span><br><span class="line">    DATA &quot;E:/ms4w/apps/data/worldmap3857/World_region.shp&quot;</span><br><span class="line">    EXTENT -20037443.7774846 -8285806.11600741 20037508.3427892 18422153.0437227</span><br><span class="line">    METADATA</span><br><span class="line">      &quot;ows_include_items&quot;    &quot;all&quot;</span><br><span class="line">      &quot;ows_extent&quot;    &quot;-20037443.7775 -8285806.11601 20037508.3428 18422153.0437&quot;</span><br><span class="line">      &quot;ows_srs&quot;    &quot;EPSG:3857&quot;</span><br><span class="line">      &quot;ows_title&quot;    &quot;World_region&quot;</span><br><span class="line">      &quot;wms_getfeatureinfo_formatlist&quot;    &quot;OGRGML&quot;</span><br><span class="line">      &quot;wms_bbox_extended&quot;    &quot;true&quot;</span><br><span class="line">      &quot;gml_include_items&quot;    &quot;all&quot;</span><br><span class="line">    END # METADATA</span><br><span class="line">    NAME &quot;World_region&quot;</span><br><span class="line">    PROJECTION</span><br><span class="line">      &quot;proj=merc&quot;</span><br><span class="line">      &quot;a=6378137&quot;</span><br><span class="line">      &quot;b=6378137&quot;</span><br><span class="line">      &quot;lat_ts=0.0&quot;</span><br><span class="line">      &quot;lon_0=0.0&quot;</span><br><span class="line">      &quot;x_0=0.0&quot;</span><br><span class="line">      &quot;y_0=0&quot;</span><br><span class="line">      &quot;k=1.0&quot;</span><br><span class="line">      &quot;units=m&quot;</span><br><span class="line">      &quot;nadgrids=@null&quot;</span><br><span class="line">      &quot;wktext&quot;</span><br><span class="line">      &quot;no_defs&quot;</span><br><span class="line">    END # PROJECTION</span><br><span class="line">    STATUS ON</span><br><span class="line">    TILEITEM &quot;location&quot;</span><br><span class="line">    TYPE POLYGON</span><br><span class="line">    UNITS METERS</span><br><span class="line">    CLASS</span><br><span class="line">      NAME &quot;Single symbol&quot;</span><br><span class="line">      STYLE</span><br><span class="line">        COLOR 209 143 80</span><br><span class="line">      END # STYLE</span><br><span class="line">      STYLE</span><br><span class="line">        OUTLINECOLOR 0 0 1</span><br><span class="line">      END # STYLE</span><br><span class="line">    END # CLASS</span><br><span class="line">  END # LAYER</span><br><span class="line"></span><br><span class="line">END # MAP</span><br></pre></td></tr></table></figure>
+<p>所有配置和示例我都放在了github仓库中<a href="https://github.com/zrysmt/mapserver-leaflet-openlayers" target="_blank" rel="noopener">mapserver-leaflet-openlayers</a>。</p>
+<blockquote>
+<p><a href="https://github.com/zrysmt/mapserver-leaflet-openlayers" target="_blank" rel="noopener">https://github.com/zrysmt/mapserver-leaflet-openlayers</a></p>
+</blockquote>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/FE/" rel="tag"># FE</a>
+          
+            <a href="/tags/OpenLayers-3/" rel="tag"># OpenLayers 3</a>
+          
+            <a href="/tags/WebGIS/" rel="tag"># WebGIS</a>
+          
+            <a href="/tags/leaflet/" rel="tag"># leaflet</a>
+          
+            <a href="/tags/MapServer/" rel="tag"># MapServer</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/28/阿里巴巴校招2017前端笔试题目-原生js-html5-实现一个路由/" rel="next" title="阿里巴巴校招2017前端笔试题目 -- 原生js/html5 实现一个路由">
+                <i class="fa fa-chevron-left"></i> 阿里巴巴校招2017前端笔试题目 -- 原生js/html5 实现一个路由
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/17/WebGL基础简明教程1-简介/" rel="prev" title="WebGL基础简明教程1-简介">
+                WebGL基础简明教程1-简介 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ruyi Zhao</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">70</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">52</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-安装说明"><span class="nav-number">1.</span> <span class="nav-text">1.安装说明</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-ms4w-3-2-1-setup-exe"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 ms4w-3.2.1-setup.exe</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-osgeo4w-setup-x86-64-exe"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 osgeo4w-setup-x86_64.exe</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-QGIS几个重要的插件"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 QGIS几个重要的插件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-发布服务"><span class="nav-number">2.</span> <span class="nav-text">2.发布服务</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-使用leaflet或openlayers调用"><span class="nav-number">3.</span> <span class="nav-text">3.使用leaflet或openlayers调用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-附录：mapfile文件world3857-map"><span class="nav-number">4.</span> <span class="nav-text">4.附录：mapfile文件world3857.map</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ruyi Zhao</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

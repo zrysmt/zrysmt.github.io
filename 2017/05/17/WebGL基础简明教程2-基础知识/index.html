@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="上一篇我们介绍了使用WebGL的基础，包括顶点着色器、片元着色器、初始化WebGL，初始化着色器以及变换、动画、颜色、纹理等，这一部分的内容我们就来进入三维的世界。和上一篇文章一样，我们的这篇只做个大概的介绍，详细的内容部分请参阅《WebGL编程指南》一书。 代码存储在我的GitHub中。  https://github.com/zrysmt/data-viz/tree/master/webgl/">
+<meta name="keywords" content="FE,WebGL">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WebGL基础简明教程2-基础知识">
+<meta property="og:url" content="https://zrysmt.github.io/2017/05/17/WebGL基础简明教程2-基础知识/index.html">
+<meta property="og:site_name" content="漫漫技术路">
+<meta property="og:description" content="上一篇我们介绍了使用WebGL的基础，包括顶点着色器、片元着色器、初始化WebGL，初始化着色器以及变换、动画、颜色、纹理等，这一部分的内容我们就来进入三维的世界。和上一篇文章一样，我们的这篇只做个大概的介绍，详细的内容部分请参阅《WebGL编程指南》一书。 代码存储在我的GitHub中。  https://github.com/zrysmt/data-viz/tree/master/webgl/">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/2-1.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/2-2.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/2-3.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/2-4.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/2-5.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/2-6.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/2-7.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/2-8.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/2-9.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/2-10.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/2-11.png">
+<meta property="og:updated_time" content="2018-11-30T02:40:53.154Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="WebGL基础简明教程2-基础知识">
+<meta name="twitter:description" content="上一篇我们介绍了使用WebGL的基础，包括顶点着色器、片元着色器、初始化WebGL，初始化着色器以及变换、动画、颜色、纹理等，这一部分的内容我们就来进入三维的世界。和上一篇文章一样，我们的这篇只做个大概的介绍，详细的内容部分请参阅《WebGL编程指南》一书。 代码存储在我的GitHub中。  https://github.com/zrysmt/data-viz/tree/master/webgl/">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/2-1.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="https://zrysmt.github.io/2017/05/17/WebGL基础简明教程2-基础知识/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>WebGL基础简明教程2-基础知识 | 漫漫技术路</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">漫漫技术路</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zrysmt.github.io/2017/05/17/WebGL基础简明教程2-基础知识/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ruyi Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="漫漫技术路">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">WebGL基础简明教程2-基础知识
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-05-17 13:16:09" itemprop="dateCreated datePublished" datetime="2017-05-17T13:16:09+08:00">2017-05-17</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-11-30 10:40:53" itemprop="dateModified" datetime="2018-11-30T10:40:53+08:00">2018-11-30</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/前端技术/" itemprop="url" rel="index"><span itemprop="name">前端技术</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>上一篇我们介绍了使用WebGL的基础，包括顶点着色器、片元着色器、初始化WebGL，初始化着色器以及变换、动画、颜色、纹理等，这一部分的内容我们就来进入三维的世界。和上一篇文章一样，我们的这篇只做个大概的介绍，详细的内容部分请参阅《WebGL编程指南》一书。</p>
+<p>代码存储在我的<a href="https://github.com/zrysmt/data-viz/tree/master/webgl/demo" target="_blank" rel="noopener">GitHub</a>中。</p>
+<blockquote>
+<p><a href="https://github.com/zrysmt/data-viz/tree/master/webgl/demo" target="_blank" rel="noopener">https://github.com/zrysmt/data-viz/tree/master/webgl/demo</a></p>
+</blockquote>
+<p>首先我们来绘制一个三维的实例。<br>示例程序:<a href="https://zrysmt.github.io/demo/webgl-demo/demo/10-HelloCube.html">https://zrysmt.github.io/demo/webgl-demo/demo/10-HelloCube.html</a>.</p>
+<p><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/2-1.jpg" alt=""></p>
+<p>实例的源码程序:<a href="https://github.com/zrysmt/data-viz/blob/master/webgl/demo/HelloCube.js" target="_blank" rel="noopener">https://github.com/zrysmt/data-viz/blob/master/webgl/demo/HelloCube.js</a><br>其实这里我们应该注意到示例和源码的结构对应，下面的一些我可能只给出一个url地址。</p>
+<h1 id="1-视图、投影和索引矩阵"><a href="#1-视图、投影和索引矩阵" class="headerlink" title="1.视图、投影和索引矩阵"></a>1.视图、投影和索引矩阵</h1><h2 id="从main函数开始"><a href="#从main函数开始" class="headerlink" title="从main函数开始"></a>从main函数开始</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">main</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// Retrieve &lt;canvas&gt; element</span></span><br><span class="line">    <span class="keyword">var</span> canvas = <span class="built_in">document</span>.getElementById(<span class="string">'webgl'</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Get the rendering context for WebGL</span></span><br><span class="line">    <span class="keyword">var</span> gl = getWebGLContext(canvas);</span><br><span class="line">    <span class="keyword">if</span> (!gl) &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'Failed to get the rendering context for WebGL'</span>);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Initialize shaders</span></span><br><span class="line">    <span class="keyword">if</span> (!initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'Failed to intialize shaders.'</span>);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Set the vertex coordinates and color</span></span><br><span class="line">    <span class="keyword">var</span> n = initVertexBuffers(gl);</span><br><span class="line">    <span class="keyword">if</span> (n &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'Failed to set the vertex information'</span>);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Set clear color and enable hidden surface removal</span></span><br><span class="line">    gl.clearColor(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">1.0</span>);</span><br><span class="line">    gl.enable(gl.DEPTH_TEST);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Get the storage location of u_MvpMatrix</span></span><br><span class="line">    <span class="keyword">var</span> u_MvpMatrix = gl.getUniformLocation(gl.program, <span class="string">'u_MvpMatrix'</span>);</span><br><span class="line">    <span class="keyword">if</span> (!u_MvpMatrix) &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'Failed to get the storage location of u_MvpMatrix'</span>);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Set the eye point and the viewing volume</span></span><br><span class="line">    <span class="keyword">var</span> mvpMatrix = <span class="keyword">new</span> Matrix4();</span><br><span class="line">    mvpMatrix.setPerspective(<span class="number">30</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">100</span>);</span><br><span class="line">    mvpMatrix.lookAt(<span class="number">3</span>, <span class="number">3</span>, <span class="number">7</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Pass the model view projection matrix to u_MvpMatrix</span></span><br><span class="line">    gl.uniformMatrix4fv(u_MvpMatrix, <span class="literal">false</span>, mvpMatrix.elements);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Clear color and depth buffer</span></span><br><span class="line">    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Draw the cube</span></span><br><span class="line">    gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_BYTE, <span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="顶点着色器和片元着色器"><a href="#顶点着色器和片元着色器" class="headerlink" title="顶点着色器和片元着色器"></a>顶点着色器和片元着色器</h2><p>和上一篇有一些的不同<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> VSHADER_SOURCE =</span><br><span class="line">    <span class="string">'attribute vec4 a_Position;\n'</span> +</span><br><span class="line">    <span class="string">'attribute vec4 a_Color;\n'</span> +</span><br><span class="line">    <span class="string">'uniform mat4 u_MvpMatrix;\n'</span> +      <span class="comment">//模型矩阵，设置视图/投影</span></span><br><span class="line">    <span class="string">'varying vec4 v_Color;\n'</span> +          <span class="comment">//传值给片元着色器</span></span><br><span class="line">    <span class="string">'void main() &#123;\n'</span> +</span><br><span class="line">    <span class="string">'  gl_Position = u_MvpMatrix * a_Position;\n'</span> +</span><br><span class="line">    <span class="string">'  v_Color = a_Color;\n'</span> +</span><br><span class="line">    <span class="string">'&#125;\n'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Fragment shader program</span></span><br><span class="line"><span class="keyword">var</span> FSHADER_SOURCE =</span><br><span class="line">    <span class="string">'#ifdef GL_ES\n'</span> +</span><br><span class="line">    <span class="string">'precision mediump float;\n'</span> +    <span class="comment">//精度限定 中等精度</span></span><br><span class="line">    <span class="string">'#endif\n'</span> +</span><br><span class="line">    <span class="string">'varying vec4 v_Color;\n'</span> +</span><br><span class="line">    <span class="string">'void main() &#123;\n'</span> +</span><br><span class="line">    <span class="string">'  gl_FragColor = v_Color;\n'</span> +</span><br><span class="line">    <span class="string">'&#125;\n'</span>;</span><br></pre></td></tr></table></figure></p>
+<p>关于<strong>attribute uniform varying</strong><br><strong>attribute:</strong>只能是全局的，只能出现在顶点着色器，标识逐顶点信息；<br><strong>uniform：</strong>只能是全局的，可以在顶点着色器和片元着色器上，如果两个地方均定义，那么这变量被两个着色器共享了；<br><strong>varying:</strong>只能是全局的，负责从顶点着色器向片元着色器传输数据。  </p>
+<h2 id="视图矩阵-view-matrix"><a href="#视图矩阵-view-matrix" class="headerlink" title="视图矩阵(view matrix)"></a>视图矩阵(view matrix)</h2><p><strong>视点</strong>、<strong>观察点</strong>和<strong>上方向</strong>决定<strong>视图矩阵</strong><br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/2-2.jpg" alt=""><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> mvpMatrix = <span class="keyword">new</span> Matrix4();</span><br><span class="line">    mvpMatrix.setLookAt(<span class="number">3</span>, <span class="number">3</span>, <span class="number">7</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>)</span><br></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/2-3.jpg" alt=""></p>
+<h2 id="投影矩阵"><a href="#投影矩阵" class="headerlink" title="投影矩阵"></a>投影矩阵</h2><p>投影的作用就是使得距离近的看的比较大，距离远的看的比较小<br><a href="https://zrysmt.github.io/demo/webgl-demo/demo/8-PerspectiveView.html">示例</a><br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/2-4.png" alt=""><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">projMatrix.setPerspective(<span class="number">30</span>, canvas.width/canvas.height, <span class="number">1</span>, <span class="number">100</span>);</span><br></pre></td></tr></table></figure></p>
+<p><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/2-5.jpg" alt=""><br><strong>三角形与可视空间的位置</strong><br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/2-6.jpg" alt=""><br>其实投影矩阵的核心就是两种变换，1）按比例缩放；2）平移</p>
+<h2 id="消除被遮挡的面"><a href="#消除被遮挡的面" class="headerlink" title="消除被遮挡的面"></a>消除被遮挡的面</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gl.enable(gl.DEPTH_TEST);</span><br></pre></td></tr></table></figure>
+<p>清除颜色和深度buffer<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Clear color and depth buffer </span></span><br><span class="line">gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);</span><br></pre></td></tr></table></figure></p>
+<h2 id="重要的公式"><a href="#重要的公式" class="headerlink" title="重要的公式"></a>重要的公式</h2><p>我们总结下一个重要的公式，WebGL绘制物体的位置为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;投影矩阵&gt; X &lt;视图矩阵&gt; X  &lt;模型矩阵&gt;  X  &lt;顶点坐标&gt;</span><br></pre></td></tr></table></figure></p>
+<h2 id="绘制立方体"><a href="#绘制立方体" class="headerlink" title="绘制立方体"></a>绘制立方体</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">initVertexBuffers</span>(<span class="params">gl</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> verticesColors = <span class="keyword">new</span> <span class="built_in">Float32Array</span>([</span><br><span class="line">        <span class="comment">// Vertex coordinates and color</span></span><br><span class="line">        <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="comment">// v0 White</span></span><br><span class="line">        <span class="number">-1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">0.0</span>, <span class="number">1.0</span>, <span class="comment">// v1 Magenta</span></span><br><span class="line">        <span class="number">-1.0</span>, <span class="number">-1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="comment">// v2 Red</span></span><br><span class="line">        <span class="number">1.0</span>, <span class="number">-1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">0.0</span>, <span class="comment">// v3 Yellow</span></span><br><span class="line">        <span class="number">1.0</span>, <span class="number">-1.0</span>, <span class="number">-1.0</span>, <span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">0.0</span>, <span class="comment">// v4 Green</span></span><br><span class="line">        <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">-1.0</span>, <span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>, <span class="comment">// v5 Cyan</span></span><br><span class="line">        <span class="number">-1.0</span>, <span class="number">1.0</span>, <span class="number">-1.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">1.0</span>, <span class="comment">// v6 Blue</span></span><br><span class="line">        <span class="number">-1.0</span>, <span class="number">-1.0</span>, <span class="number">-1.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span> <span class="comment">// v7 Black</span></span><br><span class="line">    ]);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Indices of the vertices</span></span><br><span class="line">    <span class="keyword">var</span> indices = <span class="keyword">new</span> <span class="built_in">Uint8Array</span>([</span><br><span class="line">        <span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="comment">// front</span></span><br><span class="line">        <span class="number">0</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">0</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="comment">// right</span></span><br><span class="line">        <span class="number">0</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">0</span>, <span class="number">6</span>, <span class="number">1</span>, <span class="comment">// up</span></span><br><span class="line">        <span class="number">1</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">1</span>, <span class="number">7</span>, <span class="number">2</span>, <span class="comment">// left</span></span><br><span class="line">        <span class="number">7</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">7</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="comment">// down</span></span><br><span class="line">        <span class="number">4</span>, <span class="number">7</span>, <span class="number">6</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">5</span> <span class="comment">// back</span></span><br><span class="line">    ]);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Create a buffer object</span></span><br><span class="line">    <span class="keyword">var</span> vertexColorBuffer = gl.createBuffer();</span><br><span class="line">    <span class="keyword">var</span> indexBuffer = gl.createBuffer();</span><br><span class="line">    <span class="keyword">if</span> (!vertexColorBuffer || !indexBuffer) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Write the vertex coordinates and color to the buffer object</span></span><br><span class="line">    <span class="comment">// 存入缓冲：颜色/位置</span></span><br><span class="line">    gl.bindBuffer(gl.ARRAY_BUFFER, vertexColorBuffer);</span><br><span class="line">    gl.bufferData(gl.ARRAY_BUFFER, verticesColors, gl.STATIC_DRAW);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> FSIZE = verticesColors.BYTES_PER_ELEMENT;</span><br><span class="line">    <span class="comment">// Assign the buffer object to a_Position and enable the assignment</span></span><br><span class="line">    <span class="keyword">var</span> a_Position = gl.getAttribLocation(gl.program, <span class="string">'a_Position'</span>);</span><br><span class="line">    <span class="keyword">if</span> (a_Position &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'Failed to get the storage location of a_Position'</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    gl.vertexAttribPointer(a_Position, <span class="number">3</span>, gl.FLOAT, <span class="literal">false</span>, FSIZE * <span class="number">6</span>, <span class="number">0</span>);</span><br><span class="line">    gl.enableVertexAttribArray(a_Position);</span><br><span class="line">    <span class="comment">// Assign the buffer object to a_Color and enable the assignment</span></span><br><span class="line">    <span class="keyword">var</span> a_Color = gl.getAttribLocation(gl.program, <span class="string">'a_Color'</span>);</span><br><span class="line">    <span class="keyword">if</span> (a_Color &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'Failed to get the storage location of a_Color'</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    gl.vertexAttribPointer(a_Color, <span class="number">3</span>, gl.FLOAT, <span class="literal">false</span>, FSIZE * <span class="number">6</span>, FSIZE * <span class="number">3</span>);</span><br><span class="line">    gl.enableVertexAttribArray(a_Color);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Write the indices to the buffer object</span></span><br><span class="line">    <span class="comment">// 存入缓冲：索引</span></span><br><span class="line">    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);</span><br><span class="line">    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> indices.length;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>立方体的结构</strong><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">  v6----- v5</span><br><span class="line"> /|      <span class="regexp">/|</span></span><br><span class="line"><span class="regexp">v1------v0|</span></span><br><span class="line"><span class="regexp">| |     | |</span></span><br><span class="line"><span class="regexp">| |v7---|-|v4</span></span><br><span class="line"><span class="regexp">|/</span>      |<span class="regexp">/</span></span><br><span class="line"><span class="regexp">v2------v3</span></span><br></pre></td></tr></table></figure></p>
+<p>首先顶点坐标和顶点坐标的颜色存储在<code>verticesColors</code>矩阵中。<br>而WebGL的绘制是按照三角形的形式一个一个绘制的，那么意味着一个立方体的一个面有两个三角形，一个立方体总共需要2<em>6 = 12个三角形，一个三角形需要3个顶点，那么一共需要绘制 3</em>12 = 36个顶点。我们知道一个立方体只需要8个顶点就可以了。为此我们在这里使用了<strong>索引矩阵</strong>（indices），索引矩阵也要写入缓存中。<br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/2-7.jpg" alt=""><br>这样我们就能完成绘制了<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_BYTE, <span class="number">0</span>);</span><br></pre></td></tr></table></figure></p>
+<p>注意这里的<code>n = indices.length</code>。</p>
+<h1 id="2-光照"><a href="#2-光照" class="headerlink" title="2.光照"></a>2.光照</h1><p>我们主要关注下面三种形式的<strong>光照</strong>：</p>
+<p><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/2-8.jpg" alt=""></p>
+<p>物理表面<strong>反射光线：</strong>分为漫反射和环境反射</p>
+<h2 id="环境反射"><a href="#环境反射" class="headerlink" title="环境反射"></a>环境反射</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;环境反射光颜色&gt; = &lt;入射光颜色&gt; X &lt;表面基底色&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="平行光下的漫反射"><a href="#平行光下的漫反射" class="headerlink" title="平行光下的漫反射"></a>平行光下的漫反射</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;漫反射光颜色&gt; = &lt;入射光颜色&gt; X &lt;表面基底色&gt; X cosθ</span><br></pre></td></tr></table></figure>
+<p>即：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;漫反射光颜色&gt; = &lt;入射光颜色&gt; X &lt;表面基底色&gt; X （&lt;光线方向&gt; · &lt;法线方向&gt;）</span><br></pre></td></tr></table></figure></p>
+<p>我们只用漫反射的效果的时候<br><a href="https://zrysmt.github.io/demo/webgl-demo/demo/11-LightedCube.html">示例</a><br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/2-9.png" alt=""><br>由于只考虑漫反射，右边的部分几乎是黑色了，这时候我们来考虑下环境光。<br><strong>环境反射下的表面的反射光颜色</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;表面的反射光颜色&gt; = &lt;漫反射颜色&gt; + &lt;环境反射光颜色&gt;</span><br></pre></td></tr></table></figure></p>
+<p><a href="https://zrysmt.github.io/demo/webgl-demo/demo/13-LightedCube_ambient.html">示例</a><br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/2-10.png" alt=""><br>我们来看下着色器源码<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> VSHADER_SOURCE =</span><br><span class="line">  <span class="string">'attribute vec4 a_Position;\n'</span> +</span><br><span class="line">  <span class="string">'attribute vec4 a_Color;\n'</span> +        <span class="comment">//表面颜色</span></span><br><span class="line">  <span class="string">'attribute vec4 a_Normal;\n'</span> +       <span class="comment">// 表面法向量</span></span><br><span class="line">  <span class="string">'uniform mat4 u_MvpMatrix;\n'</span> +</span><br><span class="line">  <span class="string">'uniform vec3 u_DiffuseLight;\n'</span> +   <span class="comment">// 漫反射光颜色</span></span><br><span class="line">  <span class="string">'uniform vec3 u_LightDirection;\n'</span> + <span class="comment">// 漫反射入射光方向 (in the world coordinate, normalized)归一化后</span></span><br><span class="line">  <span class="string">'uniform vec3 u_AmbientLight;\n'</span> +   <span class="comment">// 环境光颜色</span></span><br><span class="line">  <span class="string">'varying vec4 v_Color;\n'</span> +</span><br><span class="line">  <span class="string">'void main() &#123;\n'</span> +</span><br><span class="line">  <span class="string">'  gl_Position = u_MvpMatrix * a_Position;\n'</span> +</span><br><span class="line">     <span class="comment">// 归一化方向量</span></span><br><span class="line">  <span class="string">'  vec3 normal = normalize(a_Normal.xyz);\n'</span> +</span><br><span class="line">     <span class="comment">// &lt;归一化的光线方向&gt; 点乘 &lt;归一化法线向量&gt;</span></span><br><span class="line">  <span class="string">'  float nDotL = max(dot(u_LightDirection, normal), 0.0);\n'</span> +</span><br><span class="line">     <span class="comment">// 计算漫反射颜色</span></span><br><span class="line">  <span class="string">'  vec3 diffuse = u_DiffuseLight * a_Color.rgb * nDotL;\n'</span> +</span><br><span class="line">     <span class="comment">// 计算环境光颜色</span></span><br><span class="line">  <span class="string">'  vec3 ambient = u_AmbientLight * a_Color.rgb;\n'</span> +</span><br><span class="line">     <span class="comment">// 两者相加得到物体最终的颜色</span></span><br><span class="line">  <span class="string">'  v_Color = vec4(diffuse + ambient, a_Color.a);\n'</span> + </span><br><span class="line">  <span class="string">'&#125;\n'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Fragment shader program</span></span><br><span class="line"><span class="keyword">var</span> FSHADER_SOURCE =</span><br><span class="line">  <span class="string">'#ifdef GL_ES\n'</span> +</span><br><span class="line">  <span class="string">'precision mediump float;\n'</span> +</span><br><span class="line">  <span class="string">'#endif\n'</span> +</span><br><span class="line">  <span class="string">'varying vec4 v_Color;\n'</span> +</span><br><span class="line">  <span class="string">'void main() &#123;\n'</span> +</span><br><span class="line">  <span class="string">'  gl_FragColor = v_Color;\n'</span> +</span><br><span class="line">  <span class="string">'&#125;\n'</span>;</span><br></pre></td></tr></table></figure></p>
+<p>对于变化后的物体，物体的法向量也会改变<br><a href="https://zrysmt.github.io/demo/webgl-demo/demo/14-LightedTranslatedRotatedCube.html">示例</a><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;变换后的法向量&gt; = &lt;法向量&gt; X &lt;变化矩阵的逆转置矩阵&gt;</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">normalMatrix.setInverseOf(modelMatrix); </span><br><span class="line">normalMatrix.transpose(); </span><br><span class="line">gl.uniformMatrix4fv(u_NormalMatrix, <span class="literal">false</span>, normalMatrix.elements);</span><br></pre></td></tr></table></figure>
+<p>在顶点着色器中变化原法向量<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vec3 normal = normalize(vec3(u_NormalMatrix * a_Normal))</span><br></pre></td></tr></table></figure></p>
+<p> 最后我们来看下最终的<strong>漫反射光颜色</strong>的公式<br> <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;漫反射光颜色&gt; = &lt;入射光颜色&gt; X &lt;表面基底色&gt; X （&lt;光线方向&gt; ·（&lt;模型矩阵逆转置矩阵&gt; X &lt;法线方向&gt;））</span><br></pre></td></tr></table></figure></p>
+<h2 id="点光源"><a href="#点光源" class="headerlink" title="点光源"></a>点光源</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">光线方向 = 归一化（点光源方向 - 顶点坐标）</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 顶点处的光线方向 = 点光源的光坐标 - 顶点坐标 </span><br><span class="line"> &apos; vec3 lightDirection = normalize(u_LightPosition - vec3(vertexPosition));\n&apos;</span><br></pre></td></tr></table></figure>
+<h1 id="3-层次模型"><a href="#3-层次模型" class="headerlink" title="3.层次模型"></a>3.层次模型</h1><p>有的物体的运动会带动别的物体，如上臂的运动会带动下臂和手掌的运动。</p>
+<p>示例:<a href="https://zrysmt.github.io/demo/webgl-demo/ch09/JointModel.html">https://zrysmt.github.io/demo/webgl-demo/ch09/JointModel.html</a><br>示例源码：<a href="https://github.com/zrysmt/data-viz/blob/master/webgl/ch09/JointModel.js" target="_blank" rel="noopener">https://github.com/zrysmt/data-viz/blob/master/webgl/ch09/JointModel.js</a></p>
+<p><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/2-11.png" alt=""><br>下边的(Arm1)会带动上边的(Arm2)运动，而上边的运动不会带动下边的。</p>
+<p>思路：共用一个变换的模型矩阵：<code>g_modelMatrix</code>,Arm1变化<code>g_modelMatrix</code>也会变化，那么Arm2也会使用这个模型。谁能控制谁，关键是谁先写上去，谁后写上去，先写上去的控制后写上去的。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Arm1 </span></span><br><span class="line"><span class="keyword">var</span> arm1Length = <span class="number">10.0</span>; <span class="comment">// Length of arm1 </span></span><br><span class="line">g_modelMatrix.setTranslate(<span class="number">0.0</span>, <span class="number">-12.0</span>, <span class="number">0.0</span>); </span><br><span class="line">g_modelMatrix.rotate(g_arm1Angle, <span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">0.0</span>); <span class="comment">// Rotate around the y-axis </span></span><br><span class="line">drawBox(gl, n, viewProjMatrix, u_MvpMatrix, u_NormalMatrix); <span class="comment">// Draw |</span></span><br><span class="line"><span class="comment">// Arm2 </span></span><br><span class="line">g_modelMatrix.translate(<span class="number">0.0</span>, arm1Length, <span class="number">0.0</span>); 　　　<span class="comment">// Move to joint1 </span></span><br><span class="line">g_modelMatrix.rotate(g_joint1Angle, <span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">1.0</span>); <span class="comment">// Rotate around the z-axis </span></span><br><span class="line">g_modelMatrix.scale(<span class="number">1.3</span>, <span class="number">1.0</span>, <span class="number">1.3</span>); <span class="comment">// Make it a little thicker </span></span><br><span class="line">drawBox(gl, n, viewProjMatrix, u_MvpMatrix, u_NormalMatrix); <span class="comment">// Draw</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="4-几个高级功能的实例"><a href="#4-几个高级功能的实例" class="headerlink" title="4.几个高级功能的实例"></a>4.几个高级功能的实例</h1><ul>
+<li><a href="https://zrysmt.github.io/demo/webgl-demo/ch10/RotateObject.html">鼠标控制物体的旋转</a></li>
+<li><a href="https://zrysmt.github.io/demo/webgl-demo/ch10/PickObject.html">是否选中物体</a></li>
+<li><a href="https://zrysmt.github.io/demo/webgl-demo/ch10/HUD.html">HUD，结合canvas绘制文本</a></li>
+<li><a href="https://zrysmt.github.io/demo/webgl-demo/ch10/Fog.html">雾化</a></li>
+<li><a href="https://zrysmt.github.io/demo/webgl-demo/ch10/Shadow.html">绘制阴影</a></li>
+<li><a href="https://zrysmt.github.io/demo/webgl-demo/ch10/OBJViewer.html">加载三维obj文件</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/FE/" rel="tag"># FE</a>
+          
+            <a href="/tags/WebGL/" rel="tag"># WebGL</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/17/WebGL基础简明教程1-简介/" rel="next" title="WebGL基础简明教程1-简介">
+                <i class="fa fa-chevron-left"></i> WebGL基础简明教程1-简介
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/22/2017阿里实习校招-前端技术视频面试体会/" rel="prev" title="2017阿里实习校招-前端技术视频面试体会">
+                2017阿里实习校招-前端技术视频面试体会 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ruyi Zhao</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">70</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">52</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-视图、投影和索引矩阵"><span class="nav-number">1.</span> <span class="nav-text">1.视图、投影和索引矩阵</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#从main函数开始"><span class="nav-number">1.1.</span> <span class="nav-text">从main函数开始</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#顶点着色器和片元着色器"><span class="nav-number">1.2.</span> <span class="nav-text">顶点着色器和片元着色器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#视图矩阵-view-matrix"><span class="nav-number">1.3.</span> <span class="nav-text">视图矩阵(view matrix)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#投影矩阵"><span class="nav-number">1.4.</span> <span class="nav-text">投影矩阵</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#消除被遮挡的面"><span class="nav-number">1.5.</span> <span class="nav-text">消除被遮挡的面</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#重要的公式"><span class="nav-number">1.6.</span> <span class="nav-text">重要的公式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#绘制立方体"><span class="nav-number">1.7.</span> <span class="nav-text">绘制立方体</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-光照"><span class="nav-number">2.</span> <span class="nav-text">2.光照</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#环境反射"><span class="nav-number">2.1.</span> <span class="nav-text">环境反射</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#平行光下的漫反射"><span class="nav-number">2.2.</span> <span class="nav-text">平行光下的漫反射</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#点光源"><span class="nav-number">2.3.</span> <span class="nav-text">点光源</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-层次模型"><span class="nav-number">3.</span> <span class="nav-text">3.层次模型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-几个高级功能的实例"><span class="nav-number">4.</span> <span class="nav-text">4.几个高级功能的实例</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ruyi Zhao</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

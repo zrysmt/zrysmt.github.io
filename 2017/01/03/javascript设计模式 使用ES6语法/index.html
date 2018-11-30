@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="参考《javascript设计模式》[美]Addy Osmani一书，下面介绍使用javascript经常会使用的主要设计模式。本博文为ES6语法的博客，还有使用ES5语法的【上】【下】两篇。主要是以下几个设计模式：  Constructor Pattern 构造模式 Module Pattern 模块化模式 Revealing Module Pattern 揭露模块化模式  Singleton">
+<meta name="keywords" content="javascript,设计模式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="javascript设计模式 使用ES6语法">
+<meta property="og:url" content="https://zrysmt.github.io/2017/01/03/javascript设计模式 使用ES6语法/index.html">
+<meta property="og:site_name" content="漫漫技术路">
+<meta property="og:description" content="参考《javascript设计模式》[美]Addy Osmani一书，下面介绍使用javascript经常会使用的主要设计模式。本博文为ES6语法的博客，还有使用ES5语法的【上】【下】两篇。主要是以下几个设计模式：  Constructor Pattern 构造模式 Module Pattern 模块化模式 Revealing Module Pattern 揭露模块化模式  Singleton">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-11-30T02:58:46.083Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="javascript设计模式 使用ES6语法">
+<meta name="twitter:description" content="参考《javascript设计模式》[美]Addy Osmani一书，下面介绍使用javascript经常会使用的主要设计模式。本博文为ES6语法的博客，还有使用ES5语法的【上】【下】两篇。主要是以下几个设计模式：  Constructor Pattern 构造模式 Module Pattern 模块化模式 Revealing Module Pattern 揭露模块化模式  Singleton">
+
+
+
+
+
+
+  <link rel="canonical" href="https://zrysmt.github.io/2017/01/03/javascript设计模式 使用ES6语法/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>javascript设计模式 使用ES6语法 | 漫漫技术路</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">漫漫技术路</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zrysmt.github.io/2017/01/03/javascript设计模式 使用ES6语法/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ruyi Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="漫漫技术路">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">javascript设计模式 使用ES6语法
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-01-03 00:00:00" itemprop="dateCreated datePublished" datetime="2017-01-03T00:00:00+08:00">2017-01-03</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-11-30 10:58:46" itemprop="dateModified" datetime="2018-11-30T10:58:46+08:00">2018-11-30</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/前端技术/" itemprop="url" rel="index"><span itemprop="name">前端技术</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>参考《javascript设计模式》[美]Addy Osmani一书，下面介绍使用javascript经常会使用的主要设计模式。本博文为ES6语法的博客，还有使用ES5语法的【上】【下】两篇。<br>主要是以下几个设计模式：</p>
+<ul>
+<li>Constructor Pattern 构造模式</li>
+<li>Module Pattern 模块化模式</li>
+<li>Revealing Module Pattern 揭露模块化模式 </li>
+<li>Singleton Pattern 单例模式</li>
+<li>Observer Pattern  观察者模式</li>
+<li>Mediator Pattern 中介者模式</li>
+<li>Prototype Pattern 原型模式</li>
+<li>Command Pattern 命令行模式</li>
+<li>Facade Pattern 外观模式</li>
+<li>Factory Pattern 工厂模式</li>
+<li>Mixin Pattern 混入模式</li>
+<li>Decorator Pattern 装饰者模式</li>
+<li>Flyweight Pattern 享元模式</li>
+</ul>
+<blockquote>
+<p>所有代码挂在我的<a href="https://github.com/zrysmt/javascript-design-pattern" target="_blank" rel="noopener">github</a>上，包含有ES5和ES6语法实现的内容。<br><a href="https://github.com/zrysmt/javascript-design-pattern" target="_blank" rel="noopener">https://github.com/zrysmt/javascript-design-pattern</a></p>
+</blockquote>
+<h1 id="1-Module-Pattern-模块化模式"><a href="#1-Module-Pattern-模块化模式" class="headerlink" title="1.Module Pattern 模块化模式"></a>1.Module Pattern 模块化模式</h1><p>模块化很好理解，目前很多提供模块化的库如require.js(AMD),sea.js(CMD),现在我们就看看怎样自己编写的代码能够支持模块化。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> privateName = <span class="built_in">Symbol</span>(<span class="string">'privateName'</span>);<span class="comment">//利用Symbol做成私有的变量</span></span><br><span class="line"><span class="comment">//直接用class类</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyModule</span> </span>&#123;</span><br><span class="line">    set container(value) &#123;</span><br><span class="line">        <span class="keyword">this</span>.value = value;</span><br><span class="line">    &#125;</span><br><span class="line">    get container() &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.value;</span><br><span class="line">    &#125;</span><br><span class="line">    init() &#123;</span><br><span class="line">        <span class="keyword">this</span>.value = <span class="string">'ES6 module'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    [privateName]()&#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">"hi"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> Module;</span><br></pre></td></tr></table></figure>
+<h1 id="2-Singleton-Pattern-单例模式"><a href="#2-Singleton-Pattern-单例模式" class="headerlink" title="2.Singleton Pattern 单例模式"></a>2.Singleton Pattern 单例模式</h1><p>确保实例化或者说是创建对象的时候只实例化/创建一次。</p>
+<ul>
+<li>一般的单例模式</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> instance = <span class="literal">null</span>;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">mySingleton</span> </span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>() &#123;</span><br><span class="line">        <span class="keyword">if</span> (!instance) instance = <span class="keyword">this</span>;</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    &#125;</span><br><span class="line">    publicMethod() &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">"The public can see me!"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> singleton1 = <span class="keyword">new</span> mySingleton();</span><br></pre></td></tr></table></figure>
+<ul>
+<li>静态方法和单例模式</li>
+</ul>
+<p>静态方法的解释不太容易说清楚，但可以从它的特点和用处来说明：<br>1）静态方法不会被继承<br>2）静态方法不用实例化（不用new）能够用直接调用（[类名/对象名].[静态方法名]）</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">mySingleton</span> </span>&#123;</span><br><span class="line">    <span class="keyword">static</span> getInstance() &#123;</span><br><span class="line">        <span class="keyword">if</span> (!mySingleton.instance) &#123;</span><br><span class="line">            mySingleton.instance = <span class="keyword">new</span> mySingleton();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> mySingleton.instance;</span><br><span class="line">    &#125;</span><br><span class="line">    publicMethod() &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">"The public can see me!"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> cache = mySingleton.getInstance();</span><br></pre></td></tr></table></figure>
+<h1 id="3-Observer-Pattern-观察者模式"><a href="#3-Observer-Pattern-观察者模式" class="headerlink" title="3.Observer Pattern  观察者模式"></a>3.Observer Pattern  观察者模式</h1><p>观察者一共有四个组件：</p>
+<ul>
+<li>Subject: maintains a list of observers, facilitates adding or removing observers<br>目标对象（类似接口，不具体实现，只有方法名）</li>
+<li>Observer: provides a update interface for objects that need to be notified of a Subject’s changes of state<br>观察者对象 主要是update方法（类似接口，不具体实现，只有方法名）</li>
+<li>ConcreteSubject: broadcasts notifications to observers on changes of state, stores the state of ConcreteObservers<br>具体目标对象，继承（实现）目标对象（实现接口）</li>
+<li>ConcreteObserver: stores a reference to the ConcreteSubject, implements an update interface for the Observer to ensure state is consistent with the Subject’s<br>具体观察者，继承（实现）观察者（实现接口）</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*Subject 目标*/</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Subject</span> </span>&#123;</span><br><span class="line">    addObserver() &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">"This method must be overwritten!"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    removeObserver() &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">"This method must be overwritten!"</span>);    </span><br><span class="line">    &#125;</span><br><span class="line">    notify() &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">"This method must be overwritten!"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Observer</span> </span>&#123;</span><br><span class="line">    update() &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">"This method must be overwritten!"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//=============================================================</span></span><br><span class="line"><span class="comment">//具体的对象</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ControlCheckbox</span> <span class="keyword">extends</span> <span class="title">Subject</span> </span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>() &#123;</span><br><span class="line">        <span class="keyword">super</span>();</span><br><span class="line">        <span class="keyword">this</span>.observers = [];</span><br><span class="line">    &#125;</span><br><span class="line">    addObserver(observer)&#123;</span><br><span class="line">        <span class="keyword">this</span>.observers.push(observer);</span><br><span class="line">    &#125;</span><br><span class="line">    notify(context) &#123;</span><br><span class="line">        <span class="keyword">let</span> observerCount = <span class="keyword">this</span>.observers.length;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; observerCount; i++) &#123;</span><br><span class="line">           <span class="keyword">this</span>.observers[i].update(context);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//具体的观察者</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AddedCheckboxs</span> <span class="keyword">extends</span> <span class="title">Observer</span></span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>(subject)&#123;</span><br><span class="line">        <span class="keyword">super</span>();</span><br><span class="line">        <span class="built_in">console</span>.log(subject);</span><br><span class="line">        <span class="keyword">this</span>.subject = subject;</span><br><span class="line">        <span class="comment">// this.subject.addObserver(this);</span></span><br><span class="line">    &#125;</span><br><span class="line">    update(context)&#123;</span><br><span class="line">        <span class="keyword">this</span>.checked = context;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//main test</span></span><br><span class="line"><span class="keyword">let</span> addBtn = <span class="built_in">document</span>.getElementById(<span class="string">"addNewObserver"</span>),</span><br><span class="line">    container = <span class="built_in">document</span>.getElementById(<span class="string">"observersContainer"</span>),</span><br><span class="line">    controlCheckboxDom = <span class="built_in">document</span>.getElementById(<span class="string">"mainCheckbox"</span>);</span><br><span class="line"><span class="keyword">let</span> controlCheckbox = <span class="keyword">new</span> ControlCheckbox();</span><br><span class="line">controlCheckboxDom.onclick = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    controlCheckbox.notify(controlCheckboxDom.checked);<span class="comment">//通知了变化</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">addBtn.onclick = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="keyword">var</span> check = <span class="built_in">document</span>.createElement(<span class="string">"input"</span>);</span><br><span class="line">    check.type = <span class="string">"checkbox"</span>;</span><br><span class="line">    <span class="comment">//新增的每一个都应该实现观察者</span></span><br><span class="line">    <span class="built_in">console</span>.info(controlCheckbox.observers);<span class="comment">//查看是否添加上</span></span><br><span class="line">    check.update = AddedCheckboxs.prototype.update;</span><br><span class="line">    controlCheckbox.addObserver(check);<span class="comment">//添加到观察者列表上去</span></span><br><span class="line">    container.appendChild(check);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其实我们现在用的最多的是它的变体-发布-订阅模式<br>简单解释下该模式，比如我们订阅了某些微信公众号，然后就等着别人发布信息，我们就能立刻接受到信息了<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//发布-订阅模式</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Pubsub</span> </span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>()&#123;</span><br><span class="line">        <span class="keyword">this</span>.subUid = <span class="number">0</span>; <span class="comment">//订阅的id值</span></span><br><span class="line">        <span class="keyword">this</span>.topics = &#123;&#125;;<span class="comment">//存放所有订阅者</span></span><br><span class="line">    &#125;</span><br><span class="line">    publish(topic, args) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">this</span>.topics[topic]) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">let</span> subscribers = <span class="keyword">this</span>.topics[topic],</span><br><span class="line">            len = subscribers ? subscribers.length : <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (len--) &#123;</span><br><span class="line">            subscribers[len].func(topic, args);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    subscribe(topic, func) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">this</span>.topics[topic]) &#123;</span><br><span class="line">            <span class="keyword">this</span>.topics[topic] = [];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">let</span> token = (++<span class="keyword">this</span>.subUid).toString();</span><br><span class="line">        <span class="keyword">this</span>.topics[topic].push(&#123;</span><br><span class="line">            token: token,</span><br><span class="line">            func: func</span><br><span class="line">        &#125;);</span><br><span class="line">        <span class="keyword">return</span> token;</span><br><span class="line">    &#125;</span><br><span class="line">    unsubscribe(token) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">let</span> m <span class="keyword">in</span> <span class="keyword">this</span>.topics) &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">this</span>.topics[m]) &#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>, j = <span class="keyword">this</span>.topics[m].length; i &lt; j; i++) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (<span class="keyword">this</span>.topics[m][i].token === token) &#123;</span><br><span class="line">                        <span class="keyword">this</span>.topics[m].splice(i, <span class="number">1</span>);</span><br><span class="line">                        <span class="keyword">return</span> token;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//usage</span></span><br><span class="line"><span class="keyword">let</span> messageLogger = <span class="function"><span class="keyword">function</span>(<span class="params">topics, data</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">"Logging: "</span> + topics + <span class="string">": "</span> + data);</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">let</span> pubsub = <span class="keyword">new</span> Pubsub();</span><br><span class="line"><span class="keyword">let</span> subscription = pubsub.subscribe(<span class="string">"inbox/newMessage"</span>, messageLogger);</span><br><span class="line"></span><br><span class="line">pubsub.publish(<span class="string">"inbox/newMessage"</span>, <span class="string">"hello world!"</span>);</span><br></pre></td></tr></table></figure></p>
+<h1 id="4-Mediator-Pattern-中介者模式"><a href="#4-Mediator-Pattern-中介者模式" class="headerlink" title="4.Mediator Pattern 中介者模式"></a>4.Mediator Pattern 中介者模式</h1><p>该模式和发布订阅模式非常像，这里就不再重复了</p>
+<h1 id="5-Command-Pattern-命令行模式"><a href="#5-Command-Pattern-命令行模式" class="headerlink" title="5.Command Pattern 命令行模式"></a>5.Command Pattern 命令行模式</h1><p>命令行模式就是类似控制台输入命令的方式。说白点就是我们只使用一个方法，第一个参数是我们实际调用的方法，后面的参数是作为该调用方法的参数。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CarManager</span> </span>&#123;</span><br><span class="line">    requestInfo(model, id) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"The information for "</span> + model + <span class="string">" with ID "</span> + id + <span class="string">" is foobar"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    buyVehicle(model, id) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"You have successfully purchased Item "</span> + id + <span class="string">", a "</span> + model;</span><br><span class="line">    &#125;</span><br><span class="line">    arrangeViewing(model, id) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"You have successfully booked a viewing of "</span> + model + <span class="string">" ( "</span> + id + <span class="string">") "</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    execute(name) &#123;</span><br><span class="line">        <span class="keyword">let</span> carManager = <span class="keyword">new</span> CarManager();</span><br><span class="line">        <span class="keyword">return</span> carManager[name] &amp;&amp; carManager[name].apply(carManager, [].slice.call(<span class="built_in">arguments</span>, <span class="number">1</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> carManager = <span class="keyword">new</span> CarManager();</span><br><span class="line"><span class="built_in">console</span>.log(carManager.execute(<span class="string">"arrangeViewing"</span>, <span class="string">"Ferrari"</span>, <span class="string">"14523"</span>));</span><br><span class="line"><span class="built_in">console</span>.log(carManager.execute(<span class="string">"requestInfo"</span>, <span class="string">"Ford Mondeo"</span>, <span class="string">"54323"</span>));</span><br><span class="line"><span class="built_in">console</span>.log(carManager.execute(<span class="string">"requestInfo"</span>, <span class="string">"Ford Escort"</span>, <span class="string">"34232"</span>));</span><br></pre></td></tr></table></figure>
+<h1 id="6-Facade-Pattern-外观模式"><a href="#6-Facade-Pattern-外观模式" class="headerlink" title="6.Facade Pattern 外观模式"></a>6.Facade Pattern 外观模式</h1><p>外观模式也是只暴露一个很简单的方法，然后该方法在内部执行，调用内部的其他方法，jquery使用了很多这种模式，如$().css、$.ajax()等。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//装饰者模式</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Facade</span> </span>&#123;</span><br><span class="line">    _get() &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">"current value:"</span> + <span class="keyword">this</span>.i);</span><br><span class="line">    &#125;</span><br><span class="line">    _set(val) &#123;</span><br><span class="line">        <span class="keyword">this</span>.i = val;</span><br><span class="line">    &#125;</span><br><span class="line">    _run() &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">"running"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    _jump() &#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">"jumping"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    facade(args) &#123;</span><br><span class="line">        <span class="keyword">this</span>._set(args.val);</span><br><span class="line">        <span class="keyword">this</span>._get();</span><br><span class="line">        <span class="keyword">if</span> (args._run) &#123;</span><br><span class="line">            <span class="keyword">this</span>._run();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> fa = <span class="keyword">new</span> Facade();</span><br><span class="line">fa.facade(&#123; <span class="attr">run</span>: <span class="literal">true</span>, <span class="attr">val</span>: <span class="number">10</span> &#125;);</span><br></pre></td></tr></table></figure>
+<h1 id="7-Factory-Pattern-工厂模式"><a href="#7-Factory-Pattern-工厂模式" class="headerlink" title="7.Factory Pattern 工厂模式"></a>7.Factory Pattern 工厂模式</h1><p>怎么解释呢？工厂模式就是创建一个大型的制作工厂，然后其它的对象从这个工厂中产生。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">VehicleFactory</span> </span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>() &#123;</span><br><span class="line">        <span class="keyword">this</span>.vehicleClass = Car;</span><br><span class="line">    &#125;</span><br><span class="line">    createVehicle(options) &#123;</span><br><span class="line">        <span class="keyword">if</span> (options.vehicleType === <span class="string">"car"</span>) &#123;</span><br><span class="line">            <span class="keyword">this</span>.vehicleClass = Car;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">this</span>.vehicleClass = Truck;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="keyword">this</span>.vehicleClass(options);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Car</span> </span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>(options) &#123;</span><br><span class="line">        <span class="comment">// some defaults</span></span><br><span class="line">        options = options || <span class="string">""</span>;</span><br><span class="line">        <span class="keyword">this</span>.doors = options.doors || <span class="number">4</span>;</span><br><span class="line">        <span class="keyword">this</span>.state = options.state || <span class="string">"brand new"</span>;</span><br><span class="line">        <span class="keyword">this</span>.color = options.color || <span class="string">"silver"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Truck</span> </span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>(options) &#123;</span><br><span class="line">        <span class="keyword">this</span>.state = options.state || <span class="string">"used"</span>;</span><br><span class="line">        <span class="keyword">this</span>.wheelSize = options.wheelSize || <span class="string">"large"</span>;</span><br><span class="line">        <span class="keyword">this</span>.color = options.color || <span class="string">"blue"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//usage </span></span><br><span class="line"><span class="keyword">let</span> carFactory = <span class="keyword">new</span> VehicleFactory();</span><br><span class="line"><span class="keyword">let</span> car = carFactory.createVehicle(&#123;</span><br><span class="line">    vehicleType: <span class="string">"car"</span>,</span><br><span class="line">    color: <span class="string">"yellow"</span>,</span><br><span class="line">    doors: <span class="number">6</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h1 id="8-Mixin-Pattern-混入模式"><a href="#8-Mixin-Pattern-混入模式" class="headerlink" title="8.Mixin Pattern 混入模式"></a>8.Mixin Pattern 混入模式</h1><p>简单解释下，混入就是将一个对象的方法复制给另外一个对象。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//http://es6.ruanyifeng.com/#docs/class#Mixin模式的实现</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">mix</span>(<span class="params">...mixins</span>) </span>&#123;</span><br><span class="line">  <span class="class"><span class="keyword">class</span> <span class="title">Mix</span> </span>&#123;&#125;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> mixin <span class="keyword">of</span> mixins) &#123;</span><br><span class="line">    copyProperties(Mix, mixin);</span><br><span class="line">    copyProperties(Mix.prototype, mixin.prototype);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> Mix;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">copyProperties</span>(<span class="params">target, source</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> key <span class="keyword">of</span> <span class="built_in">Reflect</span>.ownKeys(source)) &#123;</span><br><span class="line">    <span class="keyword">if</span> ( key !== <span class="string">"constructor"</span> &amp;&amp; key !== <span class="string">"prototype"</span> &amp;&amp; key !== <span class="string">"name"</span></span><br><span class="line">    ) &#123;</span><br><span class="line">      <span class="keyword">let</span> desc = <span class="built_in">Object</span>.getOwnPropertyDescriptor(source, key);</span><br><span class="line">      <span class="built_in">Object</span>.defineProperty(target, key, desc);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//使用-继承即可</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DistributedEdit</span> <span class="keyword">extends</span> <span class="title">mix</span>(<span class="title">Loggable</span>, <span class="title">Serializable</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="9-Decorator-Pattern-装饰者模式"><a href="#9-Decorator-Pattern-装饰者模式" class="headerlink" title="9.Decorator Pattern 装饰者模式"></a>9.Decorator Pattern 装饰者模式</h1><p>装饰模式是只针对一个基本的对象，添加一些修饰。如下面的是对MacBook，加内存（Memory函数装饰）增加75美元，雕刻（Engraving函数装饰）增加200美元，买保险（Insurance函数装饰）增加250美元。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MacBook</span> </span>&#123;</span><br><span class="line">    cost() &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">997</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    screenSize() &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">11.6</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Memory</span>(<span class="params">macbook</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> v = macbook.cost();</span><br><span class="line">    macbook.cost = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> v + <span class="number">75</span>;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Decorator 2</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Engraving</span>(<span class="params">macbook</span>) </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">let</span> v = macbook.cost();</span><br><span class="line">    macbook.cost = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> v + <span class="number">200</span>;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Decorator 3</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Insurance</span>(<span class="params">macbook</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> v = macbook.cost();</span><br><span class="line">    macbook.cost = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> v + <span class="number">250</span>;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">let</span> mb = <span class="keyword">new</span> MacBook();</span><br><span class="line">Memory(mb);</span><br><span class="line">Engraving(mb);</span><br><span class="line">Insurance(mb);</span><br><span class="line"><span class="built_in">console</span>.log(mb.cost());<span class="comment">// Outputs: 1522</span></span><br><span class="line"><span class="built_in">console</span>.log(mb.screenSize());<span class="comment">// Outputs: 11.6</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="10-Flyweight-Pattern-享元模式"><a href="#10-Flyweight-Pattern-享元模式" class="headerlink" title="10.Flyweight Pattern 享元模式"></a>10.Flyweight Pattern 享元模式</h1><p>享元模式我感觉就是共享一些数据或者方法，有一个工厂可以管理</p>
+<ul>
+<li>Flyweight<br>享元对象（类似于接口），提供的可以共享的属性/方法；</li>
+<li>Concrete Flyweight<br>具体享元对象，实现接口，具体实现享元对象的方法；</li>
+<li>Flyweight Factory<br>享元工厂对象，创建并管理flyweight对象</li>
+</ul>
+<p>实现接口的方法，由于js没有，我们需要模拟。<br>这部分没有必要完全使用ES6语法，请参考我的上一篇博客。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//在js模拟存虚拟的继承，类似java中的implements</span></span><br><span class="line"><span class="built_in">Function</span>.prototype.implementsFor = <span class="function"><span class="keyword">function</span>(<span class="params">parentClassOrObject</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (parentClassOrObject.constructor === <span class="built_in">Function</span>) &#123;</span><br><span class="line">        <span class="keyword">this</span>.prototype = <span class="keyword">new</span> parentClassOrObject();</span><br><span class="line">        <span class="keyword">this</span>.prototype.consturctor = <span class="keyword">this</span>;</span><br><span class="line">        <span class="keyword">this</span>.prototype.parent = parentClassOrObject.prototype;</span><br><span class="line">    &#125;<span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">//纯虚拟继承</span></span><br><span class="line">        <span class="keyword">this</span>.prototype = parentClassOrObject;</span><br><span class="line">        <span class="keyword">this</span>.prototype.constructor = <span class="keyword">this</span>;</span><br><span class="line">        <span class="keyword">this</span>.prototype.parent = parentClassOrObject;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Flyweight object 享元对象</span></span><br><span class="line"><span class="keyword">var</span> CoffeeOrder = &#123;</span><br><span class="line">    <span class="comment">// Interfaces 接口</span></span><br><span class="line">    serveCoffee: <span class="function"><span class="keyword">function</span>(<span class="params">context</span>) </span>&#123;&#125;,</span><br><span class="line">    getFlavor: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">// ConcreteFlyweight object that creates ConcreteFlyweight 具体享元对象</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">CoffeeFlavor</span>(<span class="params">newFlavor</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> flavor = newFlavor;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> <span class="keyword">this</span>.getFlavor === <span class="string">"function"</span>) &#123;</span><br><span class="line">        <span class="keyword">this</span>.getFlavor = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> flavor;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> <span class="keyword">this</span>.serveCoffee === <span class="string">"function"</span>) &#123;</span><br><span class="line">        <span class="keyword">this</span>.serveCoffee = <span class="function"><span class="keyword">function</span>(<span class="params">context</span>) </span>&#123;</span><br><span class="line">            <span class="built_in">console</span>.log(<span class="string">"Serving Coffee flavor "</span> + flavor + <span class="string">" to table number "</span> + context.getTable());</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Implement interface for CoffeeOrder 实现接口</span></span><br><span class="line">CoffeeFlavor.implementsFor(CoffeeOrder);</span><br><span class="line"><span class="comment">// tableNumber 订单数 辅助器</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">CoffeeOrderContext</span>(<span class="params">tableNumber</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">        getTable: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> tableNumber;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//享元工厂对象</span></span><br><span class="line"><span class="comment">//创建并管理flyweight对象</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">CoffeeFlavorFactory</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> flavors = &#123;&#125;,</span><br><span class="line">        length = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">        getCoffeeFlavor: <span class="function"><span class="keyword">function</span>(<span class="params">flavorName</span>) </span>&#123;</span><br><span class="line">            <span class="comment">//这是个单例模式</span></span><br><span class="line">            <span class="keyword">var</span> flavor = flavors[flavorName];</span><br><span class="line">            <span class="keyword">if</span> (flavor === <span class="literal">undefined</span>) &#123;</span><br><span class="line">                flavor = <span class="keyword">new</span> CoffeeFlavor(flavorName);<span class="comment">//创建flyweight对象</span></span><br><span class="line">                flavors[flavorName] = flavor;</span><br><span class="line">                length++;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> flavor;</span><br><span class="line">        &#125;,</span><br><span class="line">        getTotalCoffeeFlavorsMade: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> length;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Sample usage: 测试</span></span><br><span class="line">testFlyweight()</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">testFlyweight</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// The flavors ordered. 已订购的flavors</span></span><br><span class="line">    <span class="keyword">var</span> flavors = <span class="keyword">new</span> CoffeeFlavor(),</span><br><span class="line">        <span class="comment">// The tables for the orders. </span></span><br><span class="line">        tables = <span class="keyword">new</span> CoffeeOrderContext(),</span><br><span class="line">        <span class="comment">// Number of orders made 订单数量</span></span><br><span class="line">        ordersMade = <span class="number">0</span>,</span><br><span class="line">        <span class="comment">// The CoffeeFlavorFactory instance</span></span><br><span class="line">        flavorFactory;</span><br><span class="line">    <span class="comment">//flavorIn 订单物的名称</span></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">takeOrders</span>(<span class="params">flavorIn, table</span>) </span>&#123;</span><br><span class="line">        flavors[ordersMade] = flavorFactory.getCoffeeFlavor(flavorIn);</span><br><span class="line">        <span class="comment">//flavorFactory管理者创建好后(管理者也做了处理)返回给CoffeeFlavor</span></span><br><span class="line">        tables[ordersMade++] = <span class="keyword">new</span> CoffeeOrderContext(table);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    flavorFactory = <span class="keyword">new</span> CoffeeFlavorFactory();</span><br><span class="line"></span><br><span class="line">    takeOrders(<span class="string">"Cappuccino"</span>, <span class="number">2</span>);</span><br><span class="line">    takeOrders(<span class="string">"Cappuccino"</span>, <span class="number">2</span>);</span><br><span class="line">    takeOrders(<span class="string">"Frappe"</span>, <span class="number">1</span>);</span><br><span class="line">    takeOrders(<span class="string">"Frappe"</span>, <span class="number">1</span>);</span><br><span class="line">    takeOrders(<span class="string">"Xpresso"</span>, <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; ordersMade; ++i) &#123;</span><br><span class="line">        flavors[i].serveCoffee(tables[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">"total CoffeeFlavor objects made: "</span> + flavorFactory.getTotalCoffeeFlavorsMade());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>所有代码挂在我的<a href="https://github.com/zrysmt/javascript-design-pattern" target="_blank" rel="noopener">github</a>上，包含有ES5和ES6语法实现的内容。<br><a href="https://github.com/zrysmt/javascript-design-pattern" target="_blank" rel="noopener">https://github.com/zrysmt/javascript-design-pattern</a></p>
+</blockquote>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/javascript/" rel="tag"># javascript</a>
+          
+            <a href="/tags/设计模式/" rel="tag"># 设计模式</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/05/一步一步DIY zepto库，研究zepto源码1/" rel="next" title="一步一步DIY zepto库，研究zepto源码1">
+                <i class="fa fa-chevron-left"></i> 一步一步DIY zepto库，研究zepto源码1
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/01/03/javascript设计模式【上】/" rel="prev" title="javascript设计模式【上】">
+                javascript设计模式【上】 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ruyi Zhao</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">70</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">52</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-Module-Pattern-模块化模式"><span class="nav-number">1.</span> <span class="nav-text">1.Module Pattern 模块化模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-Singleton-Pattern-单例模式"><span class="nav-number">2.</span> <span class="nav-text">2.Singleton Pattern 单例模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-Observer-Pattern-观察者模式"><span class="nav-number">3.</span> <span class="nav-text">3.Observer Pattern  观察者模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-Mediator-Pattern-中介者模式"><span class="nav-number">4.</span> <span class="nav-text">4.Mediator Pattern 中介者模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-Command-Pattern-命令行模式"><span class="nav-number">5.</span> <span class="nav-text">5.Command Pattern 命令行模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-Facade-Pattern-外观模式"><span class="nav-number">6.</span> <span class="nav-text">6.Facade Pattern 外观模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7-Factory-Pattern-工厂模式"><span class="nav-number">7.</span> <span class="nav-text">7.Factory Pattern 工厂模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#8-Mixin-Pattern-混入模式"><span class="nav-number">8.</span> <span class="nav-text">8.Mixin Pattern 混入模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#9-Decorator-Pattern-装饰者模式"><span class="nav-number">9.</span> <span class="nav-text">9.Decorator Pattern 装饰者模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#10-Flyweight-Pattern-享元模式"><span class="nav-number">10.</span> <span class="nav-text">10.Flyweight Pattern 享元模式</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ruyi Zhao</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

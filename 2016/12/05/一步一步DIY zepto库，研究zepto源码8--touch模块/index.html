@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="由于移动端众所周知的click 300ms延迟的缘故（用户碰触页面之后，需要等待一段时间来判断是不是双击（double tap）动作，而不是立即响应单击（click），等待的这段时间大约是300ms）。移动事件提供了touchstart、touchmove、touchend，却没有提供对tap的支持。许多主流框架都是自定义实现了tap事件，消除300ms的延迟，当然包括Zepto.js。 关于点击">
+<meta name="keywords" content="FE,源码,js原生实现库,zepto">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一步一步DIY zepto库，研究zepto源码8--touch模块">
+<meta property="og:url" content="https://zrysmt.github.io/2016/12/05/一步一步DIY zepto库，研究zepto源码8--touch模块/index.html">
+<meta property="og:site_name" content="漫漫技术路">
+<meta property="og:description" content="由于移动端众所周知的click 300ms延迟的缘故（用户碰触页面之后，需要等待一段时间来判断是不是双击（double tap）动作，而不是立即响应单击（click），等待的这段时间大约是300ms）。移动事件提供了touchstart、touchmove、touchend，却没有提供对tap的支持。许多主流框架都是自定义实现了tap事件，消除300ms的延迟，当然包括Zepto.js。 关于点击">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-11-30T03:06:50.850Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="一步一步DIY zepto库，研究zepto源码8--touch模块">
+<meta name="twitter:description" content="由于移动端众所周知的click 300ms延迟的缘故（用户碰触页面之后，需要等待一段时间来判断是不是双击（double tap）动作，而不是立即响应单击（click），等待的这段时间大约是300ms）。移动事件提供了touchstart、touchmove、touchend，却没有提供对tap的支持。许多主流框架都是自定义实现了tap事件，消除300ms的延迟，当然包括Zepto.js。 关于点击">
+
+
+
+
+
+
+  <link rel="canonical" href="https://zrysmt.github.io/2016/12/05/一步一步DIY zepto库，研究zepto源码8--touch模块/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>一步一步DIY zepto库，研究zepto源码8--touch模块 | 漫漫技术路</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">漫漫技术路</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zrysmt.github.io/2016/12/05/一步一步DIY zepto库，研究zepto源码8--touch模块/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ruyi Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="漫漫技术路">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">一步一步DIY zepto库，研究zepto源码8--touch模块
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2016-12-05 00:00:00" itemprop="dateCreated datePublished" datetime="2016-12-05T00:00:00+08:00">2016-12-05</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-11-30 11:06:50" itemprop="dateModified" datetime="2018-11-30T11:06:50+08:00">2018-11-30</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/前端技术/" itemprop="url" rel="index"><span itemprop="name">前端技术</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>由于移动端众所周知的click 300ms延迟的缘故（用户碰触页面之后，需要等待一段时间来判断是不是双击（double tap）动作，而不是立即响应单击（click），等待的这段时间大约是300ms）。移动事件提供了<code>touchstart</code>、<code>touchmove</code>、<code>touchend</code>，却没有提供对<code>tap</code>的支持。许多主流框架都是自定义实现了tap事件，消除300ms的延迟，当然包括Zepto.js。</p>
+<p>关于点击穿透的解决方案可以查看： <a href="http://www.ayqy.net/blog/%E7%A7%BB%E5%8A%A8%E9%A1%B5%E9%9D%A2%E7%82%B9%E5%87%BB%E7%A9%BF%E9%80%8F%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" target="_blank" rel="noopener">移动页面点击穿透问题解决方案</a>。</p>
+<p>此外，使用原生的touch事件也存在点击穿透的问题，因为click是在touch系列事件发生后大约300ms才触发的，混用touch和click肯定会导致点透问题。所以在移动端我们有必要使用类似Zepto.js的tap事件。</p>
+<blockquote>
+<p>代码挂在我的<a href="https://github.com/zrysmt/DIY-zepto" target="_blank" rel="noopener">github</a>上，对应文件夹v0.8.1。<br><a href="https://github.com/zrysmt/DIY-zepto" target="_blank" rel="noopener">https://github.com/zrysmt/DIY-zepto</a></p>
+</blockquote>
+<h1 id="1-源码"><a href="#1-源码" class="headerlink" title="1.源码"></a>1.源码</h1><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">var</span> Touch = <span class="function"><span class="keyword">function</span>(<span class="params">$</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> touch = &#123;&#125;,</span><br><span class="line">        touchTimeout, tapTimeout, swipeTimeout, longTapTimeout,</span><br><span class="line">        longTapDelay = <span class="number">750</span>,</span><br><span class="line">        gesture;</span><br><span class="line">    <span class="comment">// 判断滑动方向，返回Left, Right, Up, Down    </span></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">swipeDirection</span>(<span class="params">x1, x2, y1, y2</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">Math</span>.abs(x1 - x2) &gt;=</span><br><span class="line">            <span class="built_in">Math</span>.abs(y1 - y2) ? (x1 - x2 &gt; <span class="number">0</span> ? <span class="string">'Left'</span> : <span class="string">'Right'</span>) : (y1 - y2 &gt; <span class="number">0</span> ? <span class="string">'Up'</span> : <span class="string">'Down'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//长按</span></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">longTap</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        longTapTimeout = <span class="literal">null</span>;</span><br><span class="line">        <span class="keyword">if</span> (touch.last) &#123;</span><br><span class="line">            touch.el.trigger(<span class="string">'longTap'</span>);</span><br><span class="line">            touch = &#123;&#125;;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//取消长按</span></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">cancelLongTap</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (longTapTimeout) clearTimeout(longTapTimeout);</span><br><span class="line">        longTapTimeout = <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//取消所有</span></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">cancelAll</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (touchTimeout) clearTimeout(touchTimeout);</span><br><span class="line">        <span class="keyword">if</span> (tapTimeout) clearTimeout(tapTimeout);</span><br><span class="line">        <span class="keyword">if</span> (swipeTimeout) clearTimeout(swipeTimeout);</span><br><span class="line">        <span class="keyword">if</span> (longTapTimeout) clearTimeout(longTapTimeout);</span><br><span class="line">        touchTimeout = tapTimeout = swipeTimeout = longTapTimeout = <span class="literal">null</span>;</span><br><span class="line">        touch = &#123;&#125;;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// IE的touch事件</span></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">isPrimaryTouch</span>(<span class="params">event</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> (event.pointerType == <span class="string">'touch'</span> ||</span><br><span class="line">            event.pointerType == event.MSPOINTER_TYPE_TOUCH) &amp;&amp; event.isPrimary</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// IE鼠标事件</span></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">isPointerEventType</span>(<span class="params">e, type</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> (e.type == <span class="string">'pointer'</span> + type ||</span><br><span class="line">            e.type.toLowerCase() == <span class="string">'mspointer'</span> + type)</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    $(<span class="built_in">document</span>).ready(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> now, delta, deltaX = <span class="number">0</span>,</span><br><span class="line">            deltaY = <span class="number">0</span>,</span><br><span class="line">            firstTouch, _isPointerType;</span><br><span class="line">        <span class="comment">//IE的手势</span></span><br><span class="line">        <span class="keyword">if</span> (<span class="string">'MSGesture'</span> <span class="keyword">in</span> <span class="built_in">window</span>) &#123;</span><br><span class="line">            gesture = <span class="keyword">new</span> MSGesture();</span><br><span class="line">            gesture.target = <span class="built_in">document</span>.body;</span><br><span class="line">        &#125;</span><br><span class="line">        $(<span class="built_in">document</span>)</span><br><span class="line">            .bind(<span class="string">'MSGestureEnd'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123; <span class="comment">//处理IE手势结束</span></span><br><span class="line">                <span class="keyword">var</span> swipeDirectionFromVelocity =</span><br><span class="line">                    e.velocityX &gt; <span class="number">1</span> ? <span class="string">'Right'</span> : e.velocityX &lt; <span class="number">-1</span> ? <span class="string">'Left'</span> : e.velocityY &gt; <span class="number">1</span> ? <span class="string">'Down'</span> : e.velocityY &lt; <span class="number">-1</span> ? <span class="string">'Up'</span> : <span class="literal">null</span>;</span><br><span class="line">                <span class="keyword">if</span> (swipeDirectionFromVelocity) &#123;</span><br><span class="line">                    touch.el.trigger(<span class="string">'swipe'</span>);</span><br><span class="line">                    touch.el.trigger(<span class="string">'swipe'</span> + swipeDirectionFromVelocity);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;)</span><br><span class="line">            <span class="comment">// 处理手指接触</span></span><br><span class="line">            .on(<span class="string">'touchstart MSPointerDown pointerdown'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;</span><br><span class="line">                <span class="comment">//排除非触摸设备</span></span><br><span class="line">                <span class="keyword">if</span> ((_isPointerType = isPointerEventType(e, <span class="string">'down'</span>)) &amp;&amp;</span><br><span class="line">                    !isPrimaryTouch(e)) <span class="keyword">return</span>;</span><br><span class="line">                firstTouch = _isPointerType ? e : e.touches[<span class="number">0</span>]; <span class="comment">// 获取起点位置数据	</span></span><br><span class="line">                <span class="comment">// 重置终点坐标</span></span><br><span class="line">                <span class="keyword">if</span> (e.touches &amp;&amp; e.touches.length === <span class="number">1</span> &amp;&amp; touch.x2) &#123;</span><br><span class="line">                    <span class="comment">// Clear out touch movement data if we have it sticking around</span></span><br><span class="line">                    <span class="comment">// This can occur if touchcancel doesn't fire due to preventDefault, etc.</span></span><br><span class="line">                    touch.x2 = <span class="literal">undefined</span>;</span><br><span class="line">                    touch.y2 = <span class="literal">undefined</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 判断用户动作类型</span></span><br><span class="line">                now = <span class="built_in">Date</span>.now();</span><br><span class="line">                delta = now - (touch.last || now); <span class="comment">// 距离上次碰触的时间差</span></span><br><span class="line">                touch.el = $(<span class="string">'tagName'</span> <span class="keyword">in</span> firstTouch.target ?</span><br><span class="line">                    firstTouch.target : firstTouch.target.parentNode); <span class="comment">// 手指碰触的元素</span></span><br><span class="line">                touchTimeout &amp;&amp; clearTimeout(touchTimeout); <span class="comment">// 重置touch事件处理器的Timeout ID</span></span><br><span class="line">                <span class="comment">//记录起点坐标</span></span><br><span class="line">                touch.x1 = firstTouch.pageX;</span><br><span class="line">                touch.y1 = firstTouch.pageY;</span><br><span class="line">                <span class="comment">//判断是否双击</span></span><br><span class="line">                <span class="keyword">if</span> (delta &gt; <span class="number">0</span> &amp;&amp; delta &lt;= <span class="number">250</span>) touch.isDoubleTap = <span class="literal">true</span>;</span><br><span class="line">                touch.last = now;</span><br><span class="line">                <span class="comment">// 注册长按事件处理器ID</span></span><br><span class="line">                longTapTimeout = setTimeout(longTap, longTapDelay);</span><br><span class="line">                <span class="comment">// adds the current touch contact for IE gesture recognition</span></span><br><span class="line">                <span class="comment">// 支持IE手势识别</span></span><br><span class="line">                <span class="keyword">if</span> (gesture &amp;&amp; _isPointerType) gesture.addPointer(e.pointerId);</span><br><span class="line">            &#125;)</span><br><span class="line">            <span class="comment">// 处理手指滑动</span></span><br><span class="line">            .on(<span class="string">'touchmove MSPointerMove pointermove'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;</span><br><span class="line">                <span class="comment">// 排除非触摸设备</span></span><br><span class="line">                <span class="keyword">if</span> ((_isPointerType = isPointerEventType(e, <span class="string">'move'</span>)) &amp;&amp;</span><br><span class="line">                    !isPrimaryTouch(e)) <span class="keyword">return</span>;</span><br><span class="line">                firstTouch = _isPointerType ? e : e.touches[<span class="number">0</span>];</span><br><span class="line">                cancelLongTap(); <span class="comment">// 取消长按事件处理器</span></span><br><span class="line">                touch.x2 = firstTouch.pageX;</span><br><span class="line">                touch.y2 = firstTouch.pageY;</span><br><span class="line"></span><br><span class="line">                deltaX += <span class="built_in">Math</span>.abs(touch.x1 - touch.x2);</span><br><span class="line">                deltaY += <span class="built_in">Math</span>.abs(touch.y1 - touch.y2);</span><br><span class="line">            &#125;)</span><br><span class="line">            <span class="comment">// 处理手指离开</span></span><br><span class="line">            .on(<span class="string">'touchend MSPointerUp pointerup'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;</span><br><span class="line">                <span class="comment">// 排除非触摸设备</span></span><br><span class="line">                <span class="keyword">if</span> ((_isPointerType = isPointerEventType(e, <span class="string">'up'</span>)) &amp;&amp;</span><br><span class="line">                    !isPrimaryTouch(e)) <span class="keyword">return</span>;</span><br><span class="line">                cancelLongTap(); <span class="comment">// 取消长按事件处理器</span></span><br><span class="line"></span><br><span class="line">                <span class="comment">// swipe  判定滑动动作（起点 - 终点的横向或者纵向距离超过30px）</span></span><br><span class="line">                <span class="keyword">if</span> ((touch.x2 &amp;&amp; <span class="built_in">Math</span>.abs(touch.x1 - touch.x2) &gt; <span class="number">30</span>) ||</span><br><span class="line">                    (touch.y2 &amp;&amp; <span class="built_in">Math</span>.abs(touch.y1 - touch.y2) &gt; <span class="number">30</span>)) &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">                    <span class="comment">// 注册长按事件处理器ID（立即准备执行长按）</span></span><br><span class="line">                    swipeTimeout = setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">                        <span class="keyword">if</span> (touch.el) &#123;</span><br><span class="line">                            touch.el.trigger(<span class="string">'swipe'</span>); <span class="comment">// 触发长按</span></span><br><span class="line">                            <span class="comment">// 触发向上|下|左|右的长按</span></span><br><span class="line">                            touch.el.trigger(<span class="string">'swipe'</span> + (swipeDirection(touch.x1, touch.x2, touch.y1, touch.y2)))</span><br><span class="line">                        &#125;</span><br><span class="line">                        touch = &#123;&#125;; <span class="comment">// 清空数据，本次touch结束</span></span><br><span class="line">                    &#125;, <span class="number">0</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// normal tap 正常轻触</span></span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">'last'</span> <span class="keyword">in</span> touch) &#123; <span class="comment">// 如果记录了上次接触时间</span></span><br><span class="line">                    <span class="comment">// don't fire tap when delta position changed by more than 30 pixels,</span></span><br><span class="line">                    <span class="comment">// for instance when moving to a point and back to origin</span></span><br><span class="line">                    <span class="keyword">if</span> (deltaX &lt; <span class="number">30</span> &amp;&amp; deltaY &lt; <span class="number">30</span>) &#123;</span><br><span class="line">                        <span class="comment">// delay by one tick so we can cancel the 'tap' event if 'scroll' fires</span></span><br><span class="line">                        <span class="comment">// ('tap' fires before 'scroll')</span></span><br><span class="line">                        <span class="comment">//立即准备执行轻触，不立即执行是为了scroll时能取消执行轻触</span></span><br><span class="line">                        tapTimeout = setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">                            <span class="comment">// trigger universal 'tap' with the option to cancelTouch()</span></span><br><span class="line">                            <span class="comment">// (cancelTouch cancels processing of single vs double taps for faster 'tap' response)</span></span><br><span class="line">                            <span class="comment">// 触发全局tap，cancelTouch()可以取消singleTap，doubleTap事件，以求更快响应轻触</span></span><br><span class="line">                            <span class="keyword">var</span> event = $.Event(<span class="string">'tap'</span>);</span><br><span class="line">                            event.cancelTouch = cancelAll;</span><br><span class="line">                            <span class="comment">// [by paper] fix -&gt; "TypeError: 'undefined' is not an object (evaluating 'touch.el.trigger'), when double tap</span></span><br><span class="line">                            <span class="keyword">if</span> (touch.el) touch.el.trigger(event);</span><br><span class="line"></span><br><span class="line">                            <span class="comment">// trigger double tap immediately</span></span><br><span class="line">                            <span class="comment">// 立即触发doubleTap</span></span><br><span class="line">                            <span class="keyword">if</span> (touch.isDoubleTap) &#123;</span><br><span class="line">                                <span class="keyword">if</span> (touch.el) touch.el.trigger(<span class="string">'doubleTap'</span>);</span><br><span class="line">                                touch = &#123;&#125;;</span><br><span class="line">                            &#125;</span><br><span class="line"></span><br><span class="line">                            <span class="comment">// trigger single tap after 250ms of inactivity</span></span><br><span class="line">                            <span class="comment">// 250ms后触发singleTap</span></span><br><span class="line">                            <span class="keyword">else</span> &#123;</span><br><span class="line">                                touchTimeout = setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">                                    touchTimeout = <span class="literal">null</span>;</span><br><span class="line">                                    <span class="keyword">if</span> (touch.el) touch.el.trigger(<span class="string">'singleTap'</span>);</span><br><span class="line">                                    touch = &#123;&#125;;</span><br><span class="line">                                &#125;, <span class="number">250</span>);</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;, <span class="number">0</span>);</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123; <span class="comment">// 如果是滑了一圈又回到起点，扔掉事件数据，不做处理</span></span><br><span class="line">                        touch = &#123;&#125;;</span><br><span class="line">                    &#125;</span><br><span class="line">                    deltaX = deltaY = <span class="number">0</span>; <span class="comment">// 重置横向，纵向滑动距离</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;)</span><br><span class="line">            <span class="comment">// when the browser window loses focus,</span></span><br><span class="line">            <span class="comment">// for example when a modal dialog is shown,</span></span><br><span class="line">            <span class="comment">// cancel all ongoing events</span></span><br><span class="line">            <span class="comment">// 浏览器窗口失去焦点时，取消所有事件处理动作</span></span><br><span class="line">            .on(<span class="string">'touchcancel MSPointerCancel pointercancel'</span>, cancelAll);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// scrolling the window indicates intention of the user</span></span><br><span class="line">        <span class="comment">// to scroll, not tap or swipe, so cancel all ongoing events</span></span><br><span class="line">        <span class="comment">// 触发scroll时取消所有事件处理动作</span></span><br><span class="line">        $(<span class="built_in">window</span>).on(<span class="string">'scroll'</span>, cancelAll);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//在这里注册，在源码中触发</span></span><br><span class="line">    [<span class="string">'swipe'</span>, <span class="string">'swipeLeft'</span>, <span class="string">'swipeRight'</span>, <span class="string">'swipeUp'</span>, <span class="string">'swipeDown'</span>,</span><br><span class="line">        <span class="string">'doubleTap'</span>, <span class="string">'tap'</span>, <span class="string">'singleTap'</span>, <span class="string">'longTap'</span></span><br><span class="line">    ].forEach(<span class="function"><span class="keyword">function</span>(<span class="params">eventName</span>) </span>&#123;</span><br><span class="line">        $.fn[eventName] = <span class="function"><span class="keyword">function</span>(<span class="params">callback</span>) </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>.on(eventName, callback);</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> Touch;</span><br></pre></td></tr></table></figure>
+<h1 id="2-源码分析"><a href="#2-源码分析" class="headerlink" title="2.源码分析"></a>2.源码分析</h1><p>核心层分是把事件绑定到<code>$(document)</code>上分别进行处理</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$(<span class="built_in">document</span>)</span><br><span class="line">  .bind(<span class="string">'MSGestureEnd'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">e</span>)</span>&#123;&#125;<span class="comment">//处理IE手势结束</span></span><br><span class="line">  .on(<span class="string">'touchstart MSPointerDown pointerdown'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;&#125; <span class="comment">// 处理手指接触</span></span><br><span class="line">  .on(<span class="string">'touchmove MSPointerMove pointermove'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;&#125;  <span class="comment">// 处理手指滑动</span></span><br><span class="line">  .on(<span class="string">'touchend MSPointerUp pointerup'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">e</span>) </span>&#123;&#125;       <span class="comment">// 处理手指离开 </span></span><br><span class="line">  .on(<span class="string">'touchcancel MSPointerCancel pointercancel'</span>, cancelAll);</span><br><span class="line">  <span class="comment">// 浏览器窗口失去焦点时，取消所有事件处理动作</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 触发scroll时取消所有事件处理动作</span></span><br><span class="line">$(<span class="built_in">window</span>).on(<span class="string">'scroll'</span>, cancelAll);</span><br></pre></td></tr></table></figure>
+<p><code>tap</code>事件是通过<code>touch</code>事件模拟的</p>
+<ul>
+<li>tap —元素tap的时候触发。</li>
+<li>singleTap and doubleTap — 这一对事件可以用来检测元素上的单击和双击。(如果你不需要检测单击、双击，使用 tap 代替)。</li>
+<li>longTap — 当一个元素被按住超过750ms触发。</li>
+<li>swipe, swipeLeft, swipeRight, swipeUp, swipeDown — 当元素被划过时触发。(可选择给定的方向)</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (deltaX &lt; <span class="number">30</span> &amp;&amp; deltaY &lt; <span class="number">30</span>) &#123;</span><br><span class="line">    <span class="comment">//立即准备执行轻触，不立即执行是为了scroll时能取消执行轻触</span></span><br><span class="line">    tapTimeout = setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="comment">// 触发全局tap，cancelTouch()可以取消singleTap</span></span><br><span class="line">        <span class="comment">// doubleTap事件，以求更快响应轻触</span></span><br><span class="line">        <span class="keyword">var</span> event = $.Event(<span class="string">'tap'</span>);</span><br><span class="line">        event.cancelTouch = cancelAll;</span><br><span class="line">        <span class="keyword">if</span> (touch.el) touch.el.trigger(event);</span><br><span class="line">        <span class="comment">// 立即触发doubleTap</span></span><br><span class="line">        <span class="keyword">if</span> (touch.isDoubleTap) &#123;</span><br><span class="line">            <span class="keyword">if</span> (touch.el) touch.el.trigger(<span class="string">'doubleTap'</span>);</span><br><span class="line">            touch = &#123;&#125;;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 250ms后触发singleTap</span></span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            touchTimeout = setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">                touchTimeout = <span class="literal">null</span>;</span><br><span class="line">                <span class="keyword">if</span> (touch.el) touch.el.trigger(<span class="string">'singleTap'</span>);</span><br><span class="line">                touch = &#123;&#125;;</span><br><span class="line">            &#125;, <span class="number">250</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;, <span class="number">0</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123; <span class="comment">// 如果是滑了一圈又回到起点，扔掉事件数据，不做处理</span></span><br><span class="line">    touch = &#123;&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Zepto的touch模块也只实现了tap和swipe相关的动作，不支持复杂手势，需要支持复杂手势的话，可以使用 <a href="http://www.tuicool.com/articles/AR77Zz" target="_blank" rel="noopener">hammer.js</a> ，hammer提供了完善的一整套手势支持（ 注意 ：hammer也存在点击穿透问题，仍然需要手动处理该问题）</p>
+<blockquote>
+<p>代码挂在我的<a href="https://github.com/zrysmt/DIY-zepto" target="_blank" rel="noopener">github</a>上，对应文件夹v0.8.1。<br><a href="https://github.com/zrysmt/DIY-zepto" target="_blank" rel="noopener">https://github.com/zrysmt/DIY-zepto</a></p>
+</blockquote>
+<p>参考阅读：</p>
+<ul>
+<li><a href="http://www.ayqy.net/blog/%E7%A7%BB%E5%8A%A8%E9%A1%B5%E9%9D%A2%E7%82%B9%E5%87%BB%E7%A9%BF%E9%80%8F%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" target="_blank" rel="noopener">移动页面点击穿透问题解决方案</a></li>
+<li><a href="http://www.tuicool.com/articles/AR77Zz" target="_blank" rel="noopener">Zepto的touch模块源码解读</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/FE/" rel="tag"># FE</a>
+          
+            <a href="/tags/源码/" rel="tag"># 源码</a>
+          
+            <a href="/tags/js原生实现库/" rel="tag"># js原生实现库</a>
+          
+            <a href="/tags/zepto/" rel="tag"># zepto</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/05/使用javascript原生实现一个模板引擎/" rel="next" title="使用javascript原生实现一个模板引擎">
+                <i class="fa fa-chevron-left"></i> 使用javascript原生实现一个模板引擎
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/05/一步一步DIY zepto库，研究zepto源码7--动画模块(fx，fx_method)/" rel="prev" title="一步一步DIY zepto库，研究zepto源码7--动画模块(fx fx_method)">
+                一步一步DIY zepto库，研究zepto源码7--动画模块(fx fx_method) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ruyi Zhao</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">70</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">52</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-源码"><span class="nav-number">1.</span> <span class="nav-text">1.源码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-源码分析"><span class="nav-number">2.</span> <span class="nav-text">2.源码分析</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ruyi Zhao</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

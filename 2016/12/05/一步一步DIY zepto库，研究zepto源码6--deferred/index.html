@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="接下来我们来DIY另外一个重要的模块defrred延迟对象，这当然与源码有些许的不同，然而这并不重要。 基础包上要进行扩展了，输入命令： 1MODULES=&quot;zepto event ajax deferred callbacks&quot; npm run dist  代码挂在我的github上，对应文件夹v0.6.1。https://github.com/zrysmt/DIY-zepto  1.示例Dem">
+<meta name="keywords" content="FE,源码,js原生实现库,zepto">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一步一步DIY zepto库，研究zepto源码6--deferred">
+<meta property="og:url" content="https://zrysmt.github.io/2016/12/05/一步一步DIY zepto库，研究zepto源码6--deferred/index.html">
+<meta property="og:site_name" content="漫漫技术路">
+<meta property="og:description" content="接下来我们来DIY另外一个重要的模块defrred延迟对象，这当然与源码有些许的不同，然而这并不重要。 基础包上要进行扩展了，输入命令： 1MODULES=&quot;zepto event ajax deferred callbacks&quot; npm run dist  代码挂在我的github上，对应文件夹v0.6.1。https://github.com/zrysmt/DIY-zepto  1.示例Dem">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-11-30T03:06:50.850Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="一步一步DIY zepto库，研究zepto源码6--deferred">
+<meta name="twitter:description" content="接下来我们来DIY另外一个重要的模块defrred延迟对象，这当然与源码有些许的不同，然而这并不重要。 基础包上要进行扩展了，输入命令： 1MODULES=&quot;zepto event ajax deferred callbacks&quot; npm run dist  代码挂在我的github上，对应文件夹v0.6.1。https://github.com/zrysmt/DIY-zepto  1.示例Dem">
+
+
+
+
+
+
+  <link rel="canonical" href="https://zrysmt.github.io/2016/12/05/一步一步DIY zepto库，研究zepto源码6--deferred/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>一步一步DIY zepto库，研究zepto源码6--deferred | 漫漫技术路</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">漫漫技术路</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zrysmt.github.io/2016/12/05/一步一步DIY zepto库，研究zepto源码6--deferred/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ruyi Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="漫漫技术路">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">一步一步DIY zepto库，研究zepto源码6--deferred
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2016-12-05 00:00:00" itemprop="dateCreated datePublished" datetime="2016-12-05T00:00:00+08:00">2016-12-05</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-11-30 11:06:50" itemprop="dateModified" datetime="2018-11-30T11:06:50+08:00">2018-11-30</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/前端技术/" itemprop="url" rel="index"><span itemprop="name">前端技术</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>接下来我们来DIY另外一个重要的模块defrred延迟对象，这当然与源码有些许的不同，然而这并不重要。</p>
+<p>基础包上要进行扩展了，输入命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MODULES=<span class="string">"zepto event ajax deferred callbacks"</span> npm run dist</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>代码挂在我的<a href="https://github.com/zrysmt/DIY-zepto" target="_blank" rel="noopener">github</a>上，对应文件夹v0.6.1。<br><a href="https://github.com/zrysmt/DIY-zepto" target="_blank" rel="noopener">https://github.com/zrysmt/DIY-zepto</a></p>
+</blockquote>
+<h1 id="1-示例Demo"><a href="#1-示例Demo" class="headerlink" title="1.示例Demo"></a>1.示例Demo</h1><p><strong>示例1：</strong><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">$.ajax(&#123;</span><br><span class="line">        type: <span class="string">'GET'</span>,</span><br><span class="line">        <span class="comment">// type: 'POST',</span></span><br><span class="line">        url: <span class="string">'/projects.json'</span>,</span><br><span class="line">        dataType: <span class="string">'json'</span>,</span><br><span class="line">        timeout: <span class="number">300</span>,</span><br><span class="line">        success: <span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>&#123;</span><br><span class="line">            <span class="built_in">console</span>.log(data);</span><br><span class="line">        &#125;,</span><br><span class="line">        error: <span class="function"><span class="keyword">function</span>(<span class="params">xhr, type</span>) </span>&#123;</span><br><span class="line">            alert(<span class="string">'Ajax error!'</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;).done(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.info(<span class="string">"done"</span>);</span><br><span class="line">    &#125;).fail(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.info(<span class="string">"fail"</span>);</span><br><span class="line">    &#125;).always(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.info(<span class="string">"always"</span>);</span><br><span class="line">    &#125;) <span class="comment">//then 三个参数 第一个是成功后回掉，第二个是失败，第三个是运行中</span></span><br><span class="line">    .then(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.info(<span class="string">"then1"</span>);</span><br><span class="line">    &#125;, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.info(<span class="string">"then2"</span>);</span><br><span class="line">    &#125;, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.info(<span class="string">"then3"</span>);</span><br><span class="line">    &#125;);</span><br></pre></td></tr></table></figure></p>
+<p>成功后结果:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//done always then1</span></span><br></pre></td></tr></table></figure>
+<p>失败后结果:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//alert('Ajax error!')  fail always then2</span></span><br></pre></td></tr></table></figure>
+<p><strong>示例2：</strong><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> wait = <span class="function"><span class="keyword">function</span>(<span class="params">dtd</span>) </span>&#123;　　　　</span><br><span class="line">    <span class="keyword">var</span> dtd = $.Deferred(); <span class="comment">//在函数内部，新建一个Deferred对象　　　　</span></span><br><span class="line">    <span class="keyword">var</span> tasks = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;　　　　　　</span><br><span class="line">        alert(<span class="string">"执行完毕！"</span>);　　　　　　</span><br><span class="line">        dtd.resolve(); <span class="comment">// 改变Deferred对象的执行状态   　　　　</span></span><br><span class="line">    &#125;;　　</span><br><span class="line">    setTimeout(tasks, <span class="number">5000</span>);　　　　</span><br><span class="line">    <span class="keyword">return</span> dtd.promise(); <span class="comment">// 返回promise对象</span></span><br><span class="line">    <span class="comment">// 返回dtd.promise  因其没有resolve和reject方法，所以在外面不能该调用这两个方法改变状态</span></span><br><span class="line">    　　</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$.when(wait()).done(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(<span class="string">"哈哈，成功了！"</span>);</span><br><span class="line">&#125;)　　.fail(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(<span class="string">"出错啦！"</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>或者：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$.Deferred(wait).done(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(<span class="string">"哈哈，成功了！"</span>);</span><br><span class="line">&#125;)　　.fail(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(<span class="string">"出错啦！"</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
+<h1 id="2-整体结构"><a href="#2-整体结构" class="headerlink" title="2.整体结构"></a>2.整体结构</h1><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> DeferredMod = <span class="function"><span class="keyword">function</span>(<span class="params">$</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> slice = <span class="built_in">Array</span>.prototype.slice;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">Deferred</span>(<span class="params">func</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> tuples ,</span><br><span class="line">            state = <span class="string">"pending"</span>, <span class="comment">//Promoise的初始状态</span></span><br><span class="line">            promoise = &#123;</span><br><span class="line">                state: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">                    <span class="comment">//... ...</span></span><br><span class="line">                &#125;,</span><br><span class="line">                always: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">                    <span class="comment">//... ...</span></span><br><span class="line">                &#125;,</span><br><span class="line">                then: <span class="function"><span class="keyword">function</span>(<span class="params"> <span class="regexp">/* fnDone [, fnFailed [, fnProgress]] */</span> </span>) </span>&#123;</span><br><span class="line">                    <span class="comment">//... ...</span></span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="comment">//返回obj的promise对象</span></span><br><span class="line">                promise: <span class="function"><span class="keyword">function</span>(<span class="params">obj</span>) </span>&#123;</span><br><span class="line">                    <span class="comment">//... ...</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;,</span><br><span class="line">            deferred = &#123;&#125;;</span><br><span class="line">        <span class="comment">//给deferred添加切换状态方法</span></span><br><span class="line">        $.each(tuples, <span class="function"><span class="keyword">function</span>(<span class="params">i, tuple</span>) </span>&#123;</span><br><span class="line">        &#125;);</span><br><span class="line">        <span class="comment">//deferred包装成promise 继承promise对象的方法</span></span><br><span class="line">        <span class="comment">//调用promoise的promoise方法</span></span><br><span class="line">        promoise.promise(deferred);</span><br><span class="line">        <span class="comment">//传递了参数func，执行</span></span><br><span class="line">        <span class="keyword">if</span> (func) func.call(deferred, deferred);</span><br><span class="line">        <span class="comment">//返回deferred对象</span></span><br><span class="line">        <span class="keyword">return</span> deferred;</span><br><span class="line">    &#125; </span><br><span class="line">    $.when = <span class="function"><span class="keyword">function</span>(<span class="params">sub</span>)</span>&#123; &#125;;</span><br><span class="line">    $.Deferred = Deferred;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> DeferredMod;</span><br></pre></td></tr></table></figure>
+<h1 id="3-Promise规范"><a href="#3-Promise规范" class="headerlink" title="3.Promise规范"></a>3.Promise规范</h1><p>由于deferred是基于Promise规范，我们首先需要理清楚Promises/A+是什么。<br>它的规范内容大致如下</p>
+<ul>
+<li>一个promise可能有三种状态：等待（pending）、已完成（fulfilled）、已拒绝（rejected）</li>
+<li>一个promise的状态只可能从“等待”转到“完成”态或者“拒绝”态，不能逆向转换，同时“完成”态和“拒绝”态不能相互转换</li>
+<li>promise必须实现then方法（可以说，then就是promise的核心），而且then必须返回一个promise，同一个promise的then可以调用多次，并且回调的执行顺序跟它们被定义时的顺序一致</li>
+<li>then方法接受两个参数，第一个参数是成功时的回调，在promise由“等待”态转换到“完成”态时调用，另一个是失败时的回调，在promise由“等待”态转换到“拒绝”态时调用。同时，then可以接受另一个promise传入，也接受一个“类then”的对象或方法，即thenable对象</li>
+</ul>
+<p>伪代码实现：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//初始化： 等待状态  pending</span></span><br><span class="line"><span class="keyword">var</span> <span class="built_in">Promise</span> = &#123;</span><br><span class="line">    status: pending, <span class="comment">//状态</span></span><br><span class="line">    promise: <span class="function"><span class="keyword">function</span>(<span class="params">o</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> &#123;</span><br><span class="line">            done: done,</span><br><span class="line">            fail: fail</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="comment">//必须申明的then方法</span></span><br><span class="line">    then: <span class="function"><span class="keyword">function</span>(<span class="params">fulfilledFn, rejectedFn</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.done(fulfilledFn);</span><br><span class="line">        <span class="keyword">this</span>.fail(rejectedFn);</span><br><span class="line">        <span class="comment">//返回promise对象</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="comment">//当状态切换fulfilled时执行</span></span><br><span class="line">    done: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123; &#125;,</span><br><span class="line">    <span class="comment">//当状态切换rejected时执行</span></span><br><span class="line">    fail: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123; &#125;,</span><br><span class="line">    <span class="comment">//切换为已完成状态</span></span><br><span class="line">    toFulfilled: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.status = <span class="string">'fulfilled'</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="comment">//切换为已拒绝状态</span></span><br><span class="line">    toRejected: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.status = <span class="string">'rejected'</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//将函数包装成Promise对象,并注册完成、拒绝链方法</span></span><br><span class="line"><span class="comment">//通过then</span></span><br><span class="line"><span class="built_in">Promise</span>.promise(fA).then(fa1, efa1).then(fa2, efa2);</span><br><span class="line"><span class="comment">//假定fb里还调用了另一个异步FB，</span></span><br><span class="line"><span class="comment">//之前fA的异步回调执行到fb方法</span></span><br><span class="line"><span class="keyword">var</span> PA = <span class="built_in">Promise</span>.promise(fA).then(fa, efa).then(fb, efb);</span><br><span class="line"><span class="comment">//再挂上fB的异步回调</span></span><br><span class="line">PA.then(fB).then(fb1, efb1).then(fb2, efb2);</span><br></pre></td></tr></table></figure>
+<h1 id="4-Deferred函数"><a href="#4-Deferred函数" class="headerlink" title="4.Deferred函数"></a>4.Deferred函数</h1><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Deferred</span>(<span class="params">func</span>) </span>&#123;</span><br><span class="line">    <span class="comment">/*********************变量***************************************/</span></span><br><span class="line">    <span class="comment">//元组：描述状态、状态切换方法名、对应状态执行方法名、回调列表的关系</span></span><br><span class="line">    <span class="comment">//tuple引自C++/python，和list的区别是，它不可改变 ，用来存储常量集</span></span><br><span class="line">    <span class="keyword">var</span> tuples = [</span><br><span class="line">            <span class="comment">// action, add listener, listener list, final state</span></span><br><span class="line">            [<span class="string">"resolve"</span>, <span class="string">"done"</span>, $.Callbacks(&#123; <span class="attr">once</span>: <span class="number">1</span>, <span class="attr">memory</span>: <span class="number">1</span> &#125;), <span class="string">"resolved"</span>],</span><br><span class="line">            [<span class="string">"reject"</span>, <span class="string">"fail"</span>, $.Callbacks(&#123; <span class="attr">once</span>: <span class="number">1</span>, <span class="attr">memory</span>: <span class="number">1</span> &#125;), <span class="string">"rejected"</span>],</span><br><span class="line">            [<span class="string">"notify"</span>, <span class="string">"progress"</span>, $.Callbacks(&#123; <span class="attr">memory</span>: <span class="number">1</span> &#125;)]</span><br><span class="line">        ],</span><br><span class="line">        state = <span class="string">"pending"</span>, <span class="comment">//Promoise的初始状态</span></span><br><span class="line">        <span class="comment">//promise对象，promise和deferred的区别是:</span></span><br><span class="line">        <span class="comment">/*promise只包含执行阶段的方法always(),then(),done(),fail(),progress()及辅助方法state()、promise()等。</span></span><br><span class="line"><span class="comment">          deferred则在继承promise的基础上，增加切换状态的方法，resolve()/resolveWith(),reject()/rejectWith(),notify()/notifyWith()*/</span></span><br><span class="line">        <span class="comment">//所以称promise是deferred的只读副本</span></span><br><span class="line">        promise = &#123;</span><br><span class="line">            <span class="comment">// 返回状态</span></span><br><span class="line">            state: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> state;</span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="comment">//成功/失败均回调调用</span></span><br><span class="line">            always: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">                deferred.done(<span class="built_in">arguments</span>).fail(<span class="built_in">arguments</span>);</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">            &#125;,</span><br><span class="line">            then: <span class="function"><span class="keyword">function</span>(<span class="params"> <span class="regexp">/* fnDone [, fnFailed [, fnProgress]] */</span> </span>) </span>&#123;</span><br><span class="line">                <span class="keyword">var</span> fns = <span class="built_in">arguments</span>;</span><br><span class="line">                <span class="comment">//注意，这无论如何都会返回一个新的Deferred只读副本，</span></span><br><span class="line">                <span class="comment">//返回Deferred(func)函数，传递一个函数作为参数func，</span></span><br><span class="line">                <span class="comment">//`if (func) func.call(deferred, deferred);`执行func，这个时候defer就是deferred</span></span><br><span class="line">                <span class="keyword">return</span> Deferred(<span class="function"><span class="keyword">function</span>(<span class="params">defer</span>) </span>&#123;</span><br><span class="line">                    $.each(tuples, <span class="function"><span class="keyword">function</span>(<span class="params">i, tuple</span>) </span>&#123;</span><br><span class="line">                        <span class="comment">//i==0: done   i==1: fail  i==2 progress</span></span><br><span class="line">                        <span class="keyword">var</span> fn = $.isFunction(fns[i]) &amp;&amp; fns[i];</span><br><span class="line">                        <span class="comment">//执行新deferred done/fail/progress</span></span><br><span class="line">                        deferred[tuple[<span class="number">1</span>]](<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">                            <span class="comment">//直接执行新添加的回调 fnDone fnFailed fnProgress</span></span><br><span class="line">                            <span class="keyword">var</span> returned = fn &amp;&amp; fn.apply(<span class="keyword">this</span>, <span class="built_in">arguments</span>);</span><br><span class="line">                            <span class="keyword">if</span> (returned &amp;&amp; $.isFunction(returned.promise)) &#123;</span><br><span class="line">                                <span class="comment">//转向fnDone fnFailed fnProgress返回的promise对象</span></span><br><span class="line">                                <span class="comment">//注意，这里是两个promise对象的数据交流</span></span><br><span class="line">                                <span class="comment">//新deferrred对象切换为对应的成功/失败/通知状态，传递的参数为 returned.promise() 给予的参数值    </span></span><br><span class="line">                                returned.promise()</span><br><span class="line">                                    .done(defer.resolve)</span><br><span class="line">                                    .fail(defer.reject)</span><br><span class="line">                                    .progress(defer.notify);</span><br><span class="line">                            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                                <span class="keyword">var</span> context = <span class="keyword">this</span> === promise ? defer.promise() : <span class="keyword">this</span>,</span><br><span class="line">                                    values = fn ? [returned] : <span class="built_in">arguments</span>;</span><br><span class="line">                                defer[tuple[<span class="number">0</span>] + <span class="string">"With"</span>](context, values); <span class="comment">//新deferrred对象切换为对应的成功/失败/通知状态</span></span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;);</span><br><span class="line">                    &#125;);</span><br><span class="line">                    fns = <span class="literal">null</span>;</span><br><span class="line">                &#125;).promise();  <span class="comment">// 返回deferrred.promise  因其没有resolve和reject方法，所以在外面不能该调用这两个方法改变状态</span></span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="comment">//返回obj的promise对象</span></span><br><span class="line">            promise: <span class="function"><span class="keyword">function</span>(<span class="params">obj</span>) </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> obj != <span class="literal">null</span> ? $.extend(obj, promise) : promise;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>这里需要重点注意的是：promise和deferred的关系：</li>
+</ul>
+<p>promise只包含执行阶段的方法always(),then(),done(),fail(),progress()及辅助方法state()、promise()等。</p>
+<p>deferred则在继承promise的基础上（第5部分：<code>promise.promise(deferred)</code>），增加切换状态的方法，resolve()/resolveWith(),reject()/rejectWith(),notify()/notifyWith()</p>
+<p>所以称promise是deferred的只读副本</p>
+<hr>
+<ul>
+<li>赋予resolve、reject、notify真正的含义是在<code>then</code>中</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//切换的状态是resolve成功/reject失败</span></span><br><span class="line"><span class="comment">//添加首组方法做预处理，修改state的值，使成功或失败互斥，锁定progress回调列表</span></span><br><span class="line"><span class="keyword">if</span> (stateString) &#123;</span><br><span class="line">   list.add(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">      state = stateString;</span><br><span class="line">      <span class="comment">//i^1  ^异或运算符  0^1=1 1^1=0，成功或失败回调互斥，调用一方，禁用另一方</span></span><br><span class="line">   &#125;, tuples[i ^ <span class="number">1</span>][<span class="number">2</span>].disable, tuples[<span class="number">2</span>][<span class="number">2</span>].lock);</span><br><span class="line">&#125;<span class="comment">//因为回调函数带有memory，add后立刻执行</span></span><br></pre></td></tr></table></figure>
+<hr>
+<ul>
+<li>提供的<a href="http://www.css88.com/jqapi-1.9/deferred.promise/" target="_blank" rel="noopener"><code>deferred.promise()</code></a>方法的作用是，在原来的Deferred 对象上返回另一个 Deferred 对象，即受限制的 Promise 对象，受限制的 Promise 对象只开放与改变执行状态无关的方法（比如done()方法和fail()方法），屏蔽与改变执行状态有关的方法（比如resolve()方法和reject()方法），从而使得执行状态不能被改变</li>
+</ul>
+<h1 id="5-给deferred添加切换状态方法"><a href="#5-给deferred添加切换状态方法" class="headerlink" title="5.给deferred添加切换状态方法"></a>5.给deferred添加切换状态方法</h1><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//给deferred添加切换状态方法</span></span><br><span class="line">$.each(tuples, <span class="function"><span class="keyword">function</span>(<span class="params">i, tuple</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> list = tuple[<span class="number">2</span>], <span class="comment">//$.Callback</span></span><br><span class="line">        stateString = tuple[<span class="number">3</span>]; <span class="comment">//状态 一共2个：resolved  rejected</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//扩展promise的done、fail、progress为Callback的add方法，使其成为回调列表</span></span><br><span class="line">    <span class="comment">//简单写法：</span></span><br><span class="line">    <span class="comment">// promise['done'] = $.Callbacks( "once memory" ).add</span></span><br><span class="line">    <span class="comment">// promise['fail'] = $.Callbacks( "once memory" ).add  </span></span><br><span class="line">    <span class="comment">// promise['progress'] = $.Callbacks( "memory" ).add</span></span><br><span class="line">    <span class="comment">// 使用的时候  .done(func)  func就添加到了回调函数中</span></span><br><span class="line">    promise[tuple[<span class="number">1</span>]] = list.add;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//切换的状态是resolve成功/reject失败</span></span><br><span class="line">    <span class="comment">//添加首组方法做预处理，修改state的值，使成功或失败互斥，锁定progress回调列表</span></span><br><span class="line">    <span class="keyword">if</span> (stateString) &#123;</span><br><span class="line">        list.add(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">            state = stateString;</span><br><span class="line">            <span class="comment">//i^1  ^异或运算符  0^1=1 1^1=0，成功或失败回调互斥，调用一方，禁用另一方</span></span><br><span class="line">        &#125;, tuples[i ^ <span class="number">1</span>][<span class="number">2</span>].disable, tuples[<span class="number">2</span>][<span class="number">2</span>].lock);</span><br><span class="line">    &#125;<span class="comment">//因为回调函数带有memory，add后立刻执行.包括上面的 promise[tuple[1]]</span></span><br><span class="line">    <span class="comment">//添加切换状态方法 resolve()/resolveWith(),reject()/rejectWith(),notify()/notifyWith()</span></span><br><span class="line">    deferred[tuple[<span class="number">0</span>]] = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="comment">//使用list.fireWith 调用</span></span><br><span class="line">        deferred[tuple[<span class="number">0</span>] + <span class="string">"With"</span>](<span class="keyword">this</span> === deferred ? promise : <span class="keyword">this</span>, <span class="built_in">arguments</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="comment">//使用 deferred.resolveWith()就使用fireWith调用了回调函数</span></span><br><span class="line">    deferred[tuple[<span class="number">0</span>] + <span class="string">"With"</span>] = list.fireWith;</span><br><span class="line">&#125;);</span><br><span class="line"><span class="comment">//deferred包装成promise 继承promise对象的方法</span></span><br><span class="line"><span class="comment">//调用promise的promise方法</span></span><br><span class="line">promise.promise(deferred);</span><br><span class="line"><span class="comment">//传递了参数func，执行</span></span><br><span class="line"><span class="keyword">if</span> (func) func.call(deferred, deferred);</span><br><span class="line"></span><br><span class="line"><span class="comment">//返回deferred对象</span></span><br><span class="line"><span class="keyword">return</span> deferred;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="6-when"><a href="#6-when" class="headerlink" title="6.$.when"></a>6.<code>$.when</code></h1><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 主要用于多异步队列处理。</span></span><br><span class="line"><span class="comment">       多异步队列都成功，执行成功方法，一个失败，执行失败方法</span></span><br><span class="line"><span class="comment">       也可以传非异步队列对象</span></span><br><span class="line"><span class="comment">     * @param sub</span></span><br><span class="line"><span class="comment">     * @returns &#123;*&#125;</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">$.when = <span class="function"><span class="keyword">function</span>(<span class="params">sub</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> resolveValues = slice.call(<span class="built_in">arguments</span>), <span class="comment">//队列数组 ，未传参数是[]</span></span><br><span class="line">        len = resolveValues.length, <span class="comment">//队列个数</span></span><br><span class="line">        i = <span class="number">0</span>,</span><br><span class="line">        remain = len !== <span class="number">1</span> || (sub &amp;&amp; $.isFunction(sub.promise)) ? len : <span class="number">0</span>, <span class="comment">//子deferred计数</span></span><br><span class="line">        deferred = remain === <span class="number">1</span> ? sub : Deferred(), <span class="comment">//主def,如果是1个fn，直接以它为主def，否则建立新的Def</span></span><br><span class="line">        progressValues, progressContexts, resolveContexts,</span><br><span class="line">        updateFn = <span class="function"><span class="keyword">function</span>(<span class="params">i, ctx, val</span>) </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params">value</span>) </span>&#123;</span><br><span class="line">                ctx[i] = <span class="keyword">this</span>;</span><br><span class="line">                val[i] = <span class="built_in">arguments</span>.length &gt; <span class="number">1</span> ? slice.call(<span class="built_in">arguments</span>) : value; <span class="comment">// val 调用成功函数列表的参数</span></span><br><span class="line">                <span class="keyword">if</span> (val === progressValues) &#123;</span><br><span class="line">                    deferred.notifyWith(ctx, val); <span class="comment">// 如果是通知，调用主函数的通知，通知可以调用多次</span></span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (!(--remain)) &#123; <span class="comment">//如果是成功，则需等成功计数为0，即所有子def都成功执行了，remain变为0</span></span><br><span class="line">                    deferred.resolveWith(ctx, val); <span class="comment">//调用主函数的成功</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (len &gt; <span class="number">1</span>) &#123;</span><br><span class="line">        progressValues = <span class="keyword">new</span> <span class="built_in">Array</span>(len);</span><br><span class="line">        progressContexts = <span class="keyword">new</span> <span class="built_in">Array</span>(len);</span><br><span class="line">        resolveContexts = <span class="keyword">new</span> <span class="built_in">Array</span>(len);</span><br><span class="line">        <span class="keyword">for</span> (; i &lt; len; ++i) &#123;</span><br><span class="line">            <span class="keyword">if</span> (resolveValues[i] &amp;&amp; $.isFunction(resolveValues[i].promise)) &#123;</span><br><span class="line">                resolveValues[i].promise()</span><br><span class="line">                    .done(updateFn(i, resolveContexts, resolveValues)) <span class="comment">//每一个成功</span></span><br><span class="line">                    .fail(deferred.reject) <span class="comment">//直接挂入主def的失败通知函数,当某个子def失败时，</span></span><br><span class="line">                    <span class="comment">//调用主def的切换失败状态方法，执行主def的失败函数列表   </span></span><br><span class="line">                    .progress(updateFn(i, progressContexts, progressValues));</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                --remain; <span class="comment">//非def，直接标记成功，减1</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//都为非def，比如无参数，或者所有子队列全为非def，直接通知成功，进入成功函数列表</span></span><br><span class="line">    <span class="keyword">if</span> (!remain) deferred.resolveWith(resolveContexts, resolveValues);</span><br><span class="line">    <span class="keyword">return</span> deferred.promise();</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>示例可以见第一部分示例2</p>
+<blockquote>
+<p>全部代码挂在我的<a href="https://github.com/zrysmt/DIY-zepto" target="_blank" rel="noopener">github</a>上，本博文对应文件夹v0.6.x。<br><a href="https://github.com/zrysmt/DIY-zepto" target="_blank" rel="noopener">https://github.com/zrysmt/DIY-zepto</a></p>
+</blockquote>
+<p>参考阅读：</p>
+<ul>
+<li><a href="http://www.cnblogs.com/mominger/p/4411632.html" target="_blank" rel="noopener">Zepto源码分析-deferred模块</a></li>
+<li><a href="http://www.ruanyifeng.com/blog/2011/08/a_detailed_explanation_of_jquery_deferred_object.html" target="_blank" rel="noopener">jQuery的deferred对象详解</a></li>
+<li><a href="http://www.css88.com/jqapi-1.9/deferred.resolveWith/" target="_blank" rel="noopener">deferred.resolveWith()</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/FE/" rel="tag"># FE</a>
+          
+            <a href="/tags/源码/" rel="tag"># 源码</a>
+          
+            <a href="/tags/js原生实现库/" rel="tag"># js原生实现库</a>
+          
+            <a href="/tags/zepto/" rel="tag"># zepto</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/05/一步一步DIY zepto库，研究zepto源码2/" rel="next" title="一步一步DIY zepto库，研究zepto源码2">
+                <i class="fa fa-chevron-left"></i> 一步一步DIY zepto库，研究zepto源码2
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/05/一步一步DIY zepto库，研究zepto源码1/" rel="prev" title="一步一步DIY zepto库，研究zepto源码1">
+                一步一步DIY zepto库，研究zepto源码1 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ruyi Zhao</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">70</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">52</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-示例Demo"><span class="nav-number">1.</span> <span class="nav-text">1.示例Demo</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-整体结构"><span class="nav-number">2.</span> <span class="nav-text">2.整体结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-Promise规范"><span class="nav-number">3.</span> <span class="nav-text">3.Promise规范</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-Deferred函数"><span class="nav-number">4.</span> <span class="nav-text">4.Deferred函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-给deferred添加切换状态方法"><span class="nav-number">5.</span> <span class="nav-text">5.给deferred添加切换状态方法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-when"><span class="nav-number">6.</span> <span class="nav-text">6.$.when</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ruyi Zhao</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

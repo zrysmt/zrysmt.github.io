@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="deck.gl是由uber开发并开源出来的基于WebGL的大数据量可视化框架。它具有提供不同类型可视化图层，GPU渲染的高性能，React和Mapbox GL集成，结合地理信息数据（GPS）的特点。下面我们就举两个例子探索一下这个神奇的库。 1.第一站：将源码的例子跑起来源码在github里，首先克隆出来。 npm 下载，在项目根目录下1npm install (友情提醒，如果npm下载速度比较慢">
+<meta name="keywords" content="FE,WebGL,地图,WebGIS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于WebGL的大数据二三维可视化--uber的deck.gl介绍">
+<meta property="og:url" content="https://zrysmt.github.io/2017/06/02/基于WebGL的大数据二三维可视化-uber的deck-gl介绍/index.html">
+<meta property="og:site_name" content="漫漫技术路">
+<meta property="og:description" content="deck.gl是由uber开发并开源出来的基于WebGL的大数据量可视化框架。它具有提供不同类型可视化图层，GPU渲染的高性能，React和Mapbox GL集成，结合地理信息数据（GPS）的特点。下面我们就举两个例子探索一下这个神奇的库。 1.第一站：将源码的例子跑起来源码在github里，首先克隆出来。 npm 下载，在项目根目录下1npm install (友情提醒，如果npm下载速度比较慢">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/deck.gl/1.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/deck.gl/2.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/deck.gl/3.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/deck.gl/4.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/deck.gl/5.jpg">
+<meta property="og:updated_time" content="2018-11-30T02:40:53.169Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="基于WebGL的大数据二三维可视化--uber的deck.gl介绍">
+<meta name="twitter:description" content="deck.gl是由uber开发并开源出来的基于WebGL的大数据量可视化框架。它具有提供不同类型可视化图层，GPU渲染的高性能，React和Mapbox GL集成，结合地理信息数据（GPS）的特点。下面我们就举两个例子探索一下这个神奇的库。 1.第一站：将源码的例子跑起来源码在github里，首先克隆出来。 npm 下载，在项目根目录下1npm install (友情提醒，如果npm下载速度比较慢">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/deck.gl/1.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="https://zrysmt.github.io/2017/06/02/基于WebGL的大数据二三维可视化-uber的deck-gl介绍/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>基于WebGL的大数据二三维可视化--uber的deck.gl介绍 | 漫漫技术路</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">漫漫技术路</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zrysmt.github.io/2017/06/02/基于WebGL的大数据二三维可视化-uber的deck-gl介绍/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ruyi Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="漫漫技术路">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">基于WebGL的大数据二三维可视化--uber的deck.gl介绍
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-06-02 18:28:59" itemprop="dateCreated datePublished" datetime="2017-06-02T18:28:59+08:00">2017-06-02</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-11-30 10:40:53" itemprop="dateModified" datetime="2018-11-30T10:40:53+08:00">2018-11-30</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/前端技术/" itemprop="url" rel="index"><span itemprop="name">前端技术</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>deck.gl是由uber开发并开源出来的基于WebGL的大数据量可视化框架。它具有提供不同类型可视化图层，GPU渲染的高性能，React和Mapbox GL集成，结合地理信息数据（GPS）的特点。下面我们就举两个例子探索一下这个神奇的库。</p>
+<h1 id="1-第一站：将源码的例子跑起来"><a href="#1-第一站：将源码的例子跑起来" class="headerlink" title="1.第一站：将源码的例子跑起来"></a>1.第一站：将源码的例子跑起来</h1><p>源码在<a href="https://github.com/uber/deck.gl" target="_blank" rel="noopener">github</a>里，首先克隆出来。</p>
+<p>npm 下载，在项目根目录下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install</span><br></pre></td></tr></table></figure></p>
+<p>(友情提醒，如果npm下载速度比较慢，可以使用淘宝镜像，详细请自行搜索)</p>
+<p>下面我们来到例子中，和上不一样在<code>example</code>文件夹下下载安装<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install</span><br></pre></td></tr></table></figure></p>
+<p>安装成功之后，要申请mapbox的一个key。方法如下：<br>在<a href="https://www.mapbox.com/" target="_blank" rel="noopener">mapbox</a>网站注册后进入<a href="https://www.mapbox.com/studio/account/tokens/" target="_blank" rel="noopener">https://www.mapbox.com/studio/account/tokens/</a>,我们便可以在<code>Default Public Token</code><br>找到我们需要的<code>mapbox key</code>。</p>
+<p>在例子文件夹下命令行下输入<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export MAPBOX_ACCESS_TOKEN=&lt;上面申请到的key&gt;</span><br></pre></td></tr></table></figure></p>
+<p>注意：cmd会不认export,可以使用git命令行，或者直接在代码中加入<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//const MAPBOX_TOKEN = process.env.MAPBOX_ACCESS_TOKEN; //改为</span></span><br><span class="line"><span class="keyword">const</span> MAPBOX_TOKEN = <span class="xml"><span class="tag">&lt;<span class="name">上面申请到的key</span>&gt;</span></span></span><br></pre></td></tr></table></figure></p>
+<p>然后执行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm run start</span><br></pre></td></tr></table></figure></p>
+<p>浏览器会自动打开,地址为<code>localhost:3030</code>。</p>
+<p>第一例子<code>3d-heatmap</code>,我们看到<br>对应官网上的例子<a href="http://uber.github.io/deck.gl/#/examples/core-layers/hexagon-layer" target="_blank" rel="noopener">http://uber.github.io/deck.gl/#/examples/core-layers/hexagon-layer</a><br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/deck.gl/1.jpg" alt=""><br>这是一个<code>HexagonLayer</code>的例子。<br>第二个例子是利用<code>geojson</code><br>对应官网上的例子<a href="http://uber.github.io/deck.gl/#/examples/core-layers/geojson-layer" target="_blank" rel="noopener">http://uber.github.io/deck.gl/#/examples/core-layers/geojson-layer</a><br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/deck.gl/2.jpg" alt=""></p>
+<h1 id="2-第二站：先拿一个例子看看"><a href="#2-第二站：先拿一个例子看看" class="headerlink" title="2.第二站：先拿一个例子看看"></a>2.第二站：先拿一个例子看看</h1><p>第一例子<code>3d-heatmap</code>，显示效果上面有给出。</p>
+<p><a href="https://github.com/uber/deck.gl/tree/master/examples/3d-heatmap" target="_blank" rel="noopener">源码路径</a>。</p>
+<blockquote>
+<p><a href="https://github.com/uber/deck.gl/tree/master/examples/3d-heatmap" target="_blank" rel="noopener">https://github.com/uber/deck.gl/tree/master/examples/3d-heatmap</a></p>
+</blockquote>
+<p>deck.gl 是基于地理信息数据的，所以可视化很多都会分层两层，一层是地图数据底图，一层是可视化的数据。这个观念我们要记住，带进去看整个例子。对于这个例子组件<code>MapGL</code>是地里数据底图，组件<code>DeckGLOverlay</code>是可视化成的数据。</p>
+<p>基本结构很见简单。<br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/deck.gl/3.png" alt=""><br>由于是使用React框架搭建，html很简单</p>
+<ul>
+<li><strong>index.html</strong></li>
+</ul>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!doctype html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">'UTF-8'</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>deck.gl example<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="undefined"></span></span><br><span class="line"><span class="css">      <span class="selector-tag">body</span> &#123;<span class="attribute">margin</span>: <span class="number">0</span>; <span class="attribute">padding</span>: <span class="number">0</span>; <span class="attribute">overflow</span>: hidden;&#125;</span></span><br><span class="line"><span class="undefined">    </span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">'bundle.js'</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>deckgl-overlay.js</strong></li>
+</ul>
+<p>首先引入React和deckgl。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> React, &#123;Component&#125; <span class="keyword">from</span> <span class="string">'react'</span>;</span><br><span class="line"><span class="keyword">import</span> DeckGL, &#123;HexagonLayer&#125; <span class="keyword">from</span> <span class="string">'deck.gl'</span>;</span><br></pre></td></tr></table></figure></p>
+<p>几个变量先放出来，光线设置（LIGHT_SETTINGS），颜色范围设置（colorRange），高度显示范围（elevationScale），一些默认的属性（defaultProps）。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> LIGHT_SETTINGS = &#123;</span><br><span class="line">  lightsPosition: [<span class="number">-0.144528</span>, <span class="number">49.739968</span>, <span class="number">8000</span>, <span class="number">-3.807751</span>, <span class="number">54.104682</span>, <span class="number">8000</span>],</span><br><span class="line">  ambientRatio: <span class="number">0.4</span>,</span><br><span class="line">  diffuseRatio: <span class="number">0.6</span>,</span><br><span class="line">  specularRatio: <span class="number">0.2</span>,</span><br><span class="line">  lightsStrength: [<span class="number">0.8</span>, <span class="number">0.0</span>, <span class="number">0.8</span>, <span class="number">0.0</span>],</span><br><span class="line">  numberOfLights: <span class="number">2</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> colorRange = [</span><br><span class="line">  [<span class="number">1</span>, <span class="number">152</span>, <span class="number">189</span>],</span><br><span class="line">  [<span class="number">73</span>, <span class="number">227</span>, <span class="number">206</span>],</span><br><span class="line">  [<span class="number">216</span>, <span class="number">254</span>, <span class="number">181</span>],</span><br><span class="line">  [<span class="number">254</span>, <span class="number">237</span>, <span class="number">177</span>],</span><br><span class="line">  [<span class="number">254</span>, <span class="number">173</span>, <span class="number">84</span>],</span><br><span class="line">  [<span class="number">209</span>, <span class="number">55</span>, <span class="number">78</span>]</span><br><span class="line">];</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> elevationScale = &#123;<span class="attr">min</span>: <span class="number">1</span>, <span class="attr">max</span>: <span class="number">50</span>&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> defaultProps = &#123;</span><br><span class="line">  radius: <span class="number">1000</span>,</span><br><span class="line">  upperPercentile: <span class="number">100</span>,</span><br><span class="line">  coverage: <span class="number">1</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>我们建立叫<code>DeckGLOverlay</code>的组件<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="class"><span class="keyword">class</span> <span class="title">DeckGLOverlay</span> <span class="keyword">extends</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>组件中提供了两个静态的属性，静态属性可以使用[类名].[方法名]调用，例如：<code>DeckGLOverlay.defaultColorRange</code>。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> get defaultColorRange() &#123;<span class="comment">//默认的颜色范围</span></span><br><span class="line">  <span class="keyword">return</span> colorRange;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> get defaultViewport() &#123;<span class="comment">//默认的视图</span></span><br><span class="line">  <span class="keyword">return</span> &#123;</span><br><span class="line">    longitude: <span class="number">-1.4157267858730052</span>,</span><br><span class="line">    latitude: <span class="number">52.232395363869415</span>,</span><br><span class="line">    zoom: <span class="number">6.6</span>,</span><br><span class="line">    minZoom: <span class="number">5</span>,</span><br><span class="line">    maxZoom: <span class="number">15</span>,</span><br><span class="line">    pitch: <span class="number">40.5</span>,</span><br><span class="line">    bearing: <span class="number">-27.396674584323023</span></span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><code>constructor</code>是构造函数，主要看的是<code>_animateHeight</code>对组件state的设置，这个是用来控制高度的<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">constructor</span>(props) &#123;</span><br><span class="line">  <span class="keyword">super</span>(props);</span><br><span class="line">  <span class="keyword">this</span>.startAnimationTimer = <span class="literal">null</span>;</span><br><span class="line">  <span class="keyword">this</span>.intervalTimer = <span class="literal">null</span>;</span><br><span class="line">  <span class="keyword">this</span>.state = &#123;</span><br><span class="line">    elevationScale: elevationScale.min</span><br><span class="line">  &#125;;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">this</span>._startAnimate = <span class="keyword">this</span>._startAnimate.bind(<span class="keyword">this</span>);</span><br><span class="line">  <span class="keyword">this</span>._animateHeight = <span class="keyword">this</span>._animateHeight.bind(<span class="keyword">this</span>);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">componentDidMount() &#123;</span><br><span class="line">  <span class="keyword">this</span>._animate();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">componentWillReceiveProps(nextProps) &#123;</span><br><span class="line">  <span class="keyword">if</span> (nextProps.data.length !== <span class="keyword">this</span>.props.data.length) &#123;</span><br><span class="line">    <span class="keyword">this</span>._animate();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">componentWillUnmount() &#123;</span><br><span class="line">  <span class="keyword">this</span>._stopAnimate();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">_animate() &#123;</span><br><span class="line">  <span class="keyword">this</span>._stopAnimate();</span><br><span class="line"></span><br><span class="line">  <span class="comment">// wait 1.5 secs to start animation so that all data are loaded</span></span><br><span class="line">  <span class="keyword">this</span>.startAnimationTimer = <span class="built_in">window</span>.setTimeout(<span class="keyword">this</span>._startAnimate, <span class="number">1500</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">_startAnimate() &#123;</span><br><span class="line">  <span class="keyword">this</span>.intervalTimer = <span class="built_in">window</span>.setInterval(<span class="keyword">this</span>._animateHeight, <span class="number">20</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">_stopAnimate() &#123;</span><br><span class="line">  <span class="built_in">window</span>.clearTimeout(<span class="keyword">this</span>.startAnimationTimer);</span><br><span class="line">  <span class="built_in">window</span>.clearTimeout(<span class="keyword">this</span>.intervalTimer);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">_animateHeight() &#123;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">this</span>.state.elevationScale === elevationScale.max) &#123;</span><br><span class="line">    <span class="keyword">this</span>._stopAnimate();</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">this</span>.setState(&#123;<span class="attr">elevationScale</span>: <span class="keyword">this</span>.state.elevationScale + <span class="number">1</span>&#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">_initialize(gl) &#123;</span><br><span class="line">  gl.enable(gl.DEPTH_TEST);</span><br><span class="line">  gl.depthFunc(gl.LEQUAL);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><code>render</code>渲染方法，layers是可视化渲染的图层定义变量。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">render() &#123;</span><br><span class="line">  <span class="keyword">const</span> &#123;viewport, data, radius, coverage, upperPercentile&#125; = <span class="keyword">this</span>.props;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (!data) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">const</span> layers = [</span><br><span class="line">    <span class="keyword">new</span> HexagonLayer(&#123;</span><br><span class="line">      id: <span class="string">'heatmap'</span>,</span><br><span class="line">      colorRange,</span><br><span class="line">      coverage,</span><br><span class="line">      data,</span><br><span class="line">      elevationRange: [<span class="number">0</span>, <span class="number">3000</span>],</span><br><span class="line">      elevationScale: <span class="keyword">this</span>.state.elevationScale, <span class="comment">//高度</span></span><br><span class="line">      extruded: <span class="literal">true</span>,</span><br><span class="line">      getPosition: <span class="function"><span class="params">d</span> =&gt;</span> d,          <span class="comment">//位置</span></span><br><span class="line">      lightSettings: LIGHT_SETTINGS,</span><br><span class="line">      onHover: <span class="keyword">this</span>.props.onHover,</span><br><span class="line">      opacity: <span class="number">1</span>,</span><br><span class="line">      pickable: <span class="built_in">Boolean</span>(<span class="keyword">this</span>.props.onHover),</span><br><span class="line">      radius,</span><br><span class="line">      upperPercentile</span><br><span class="line">    &#125;)</span><br><span class="line">  ];</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> <span class="xml"><span class="tag">&lt;<span class="name">DeckGL</span> &#123;<span class="attr">...viewport</span>&#125; <span class="attr">layers</span>=<span class="string">&#123;layers&#125;</span> <span class="attr">onWebGLInitialized</span>=<span class="string">&#123;this._initialize&#125;</span> /&gt;</span>;</span></span><br><span class="line"><span class="xml">&#125;</span></span><br></pre></td></tr></table></figure></p>
+<ul>
+<li><strong>app.js</strong></li>
+</ul>
+<p>引入：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> React, &#123;Component&#125; <span class="keyword">from</span> <span class="string">'react'</span>;</span><br><span class="line"><span class="keyword">import</span> &#123;render&#125; <span class="keyword">from</span> <span class="string">'react-dom'</span>;</span><br><span class="line"><span class="keyword">import</span> MapGL <span class="keyword">from</span> <span class="string">'react-map-gl'</span>;</span><br><span class="line"><span class="keyword">import</span> DeckGLOverlay <span class="keyword">from</span> <span class="string">'./deckgl-overlay.js'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> &#123;csv <span class="keyword">as</span> requestCsv&#125; <span class="keyword">from</span> <span class="string">'d3-request'</span>;<span class="comment">//加载csv文件</span></span><br></pre></td></tr></table></figure></p>
+<p>mapbox key：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> MAPBOX_TOKEN = process.env.MAPBOX_ACCESS_TOKEN;</span><br></pre></td></tr></table></figure></p>
+<p>组件<code>Root</code>：<br>在构造函数中，我们将两个关键的变量viewport和data均放入到state中。这里的<code>MapGL</code>组件就是地理底图。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Root</span> <span class="keyword">extends</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">constructor</span>(props) &#123;</span><br><span class="line">    <span class="keyword">super</span>(props);</span><br><span class="line">    <span class="keyword">this</span>.state = &#123;</span><br><span class="line">      viewport: &#123;</span><br><span class="line">        ...DeckGLOverlay.defaultViewport,</span><br><span class="line">        width: <span class="number">500</span>,</span><br><span class="line">        height: <span class="number">500</span></span><br><span class="line">      &#125;,</span><br><span class="line">      data: <span class="literal">null</span></span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="comment">//请求csv数据</span></span><br><span class="line">    requestCsv(<span class="string">'./data/heatmap-data.csv'</span>, (error, response) =&gt; &#123;</span><br><span class="line">      <span class="keyword">if</span> (!error) &#123;</span><br><span class="line">        <span class="keyword">const</span> data = response.map(<span class="function"><span class="params">d</span> =&gt;</span> ([<span class="built_in">Number</span>(d.lng), <span class="built_in">Number</span>(d.lat)]));</span><br><span class="line">        <span class="keyword">this</span>.setState(&#123;data&#125;);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  componentDidMount() &#123;</span><br><span class="line">    <span class="built_in">window</span>.addEventListener(<span class="string">'resize'</span>, <span class="keyword">this</span>._resize.bind(<span class="keyword">this</span>));</span><br><span class="line">    <span class="keyword">this</span>._resize();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  _resize() &#123;</span><br><span class="line">    <span class="keyword">this</span>._onChangeViewport(&#123;</span><br><span class="line">      width: <span class="built_in">window</span>.innerWidth,</span><br><span class="line">      height: <span class="built_in">window</span>.innerHeight</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  _onChangeViewport(viewport) &#123;</span><br><span class="line">    <span class="keyword">this</span>.setState(&#123;</span><br><span class="line">      viewport: &#123;...this.state.viewport, ...viewport&#125;</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123;viewport, data&#125; = <span class="keyword">this</span>.state;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">      &lt;MapGL</span><br><span class="line">        &#123;...viewport&#125;</span><br><span class="line">        mapStyle=<span class="string">"mapbox://styles/mapbox/dark-v9"</span></span><br><span class="line">        perspectiveEnabled=&#123;<span class="literal">true</span>&#125;</span><br><span class="line">        onChangeViewport=&#123;<span class="keyword">this</span>._onChangeViewport.bind(<span class="keyword">this</span>)&#125;</span><br><span class="line">        mapboxApiAccessToken=&#123;MAPBOX_TOKEN&#125;&gt;</span><br><span class="line">        &lt;DeckGLOverlay</span><br><span class="line">          viewport=&#123;viewport&#125;</span><br><span class="line">          data=&#123;data || []&#125;</span><br><span class="line">        /&gt;</span><br><span class="line">      &lt;<span class="regexp">/MapGL&gt;</span></span><br><span class="line"><span class="regexp">    );</span></span><br><span class="line"><span class="regexp">  &#125;</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>渲染：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">render(<span class="xml"><span class="tag">&lt;<span class="name">Root</span> /&gt;</span>, document.body.appendChild(document.createElement('div')));</span></span><br></pre></td></tr></table></figure></p>
+<p>MapGL组件我们来修改下<code>mapStyle</code>来重新生成一张图。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mapStyle=<span class="string">"mapbox://styles/mapbox/satellite-v9"</span></span><br></pre></td></tr></table></figure></p>
+<p>来看下显示效果，地图就变成了卫星影像。<br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/deck.gl/4.jpg" alt=""></p>
+<p><a href="https://www.mapbox.com/studio/styles/" target="_blank" rel="noopener">mapbox</a>提供了几款基础的样式，我们还可以自定义样式使用。<br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/webgl/deck.gl/5.jpg" alt=""></p>
+<h1 id="3-第三站：总结一下"><a href="#3-第三站：总结一下" class="headerlink" title="3.第三站：总结一下"></a>3.第三站：总结一下</h1><p>通过上面我们就分析了一个简单的例子，使用Deck.gl，MapGL组件，利用两百多行代码就可以渲染14万多条数据，而且显示效果让我们惊叹，还支持交互，性能比较好，基于WebGL的大数据二三维可视化一个值得研究的方向。</p>
+<p><strong>参考阅读：</strong></p>
+<ul>
+<li><a href="http://uber.github.io/" target="_blank" rel="noopener">uber deck.gl官网</a></li>
+<li><a href="http://www.jianshu.com/p/143ee36b9536" target="_blank" rel="noopener">uber可能用到的可视化技术</a></li>
+<li><a href="http://www.tuicool.com/articles/fqYbieY" target="_blank" rel="noopener">Uber工程的deck.gl框架下的Web数据可视化集</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/FE/" rel="tag"># FE</a>
+          
+            <a href="/tags/WebGL/" rel="tag"># WebGL</a>
+          
+            <a href="/tags/地图/" rel="tag"># 地图</a>
+          
+            <a href="/tags/WebGIS/" rel="tag"># WebGIS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/22/leaflet可视化平台搭建/" rel="next" title="leaflet可视化平台搭建">
+                <i class="fa fa-chevron-left"></i> leaflet可视化平台搭建
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/23/使用React+Three.js封装一个三维地球/" rel="prev" title="使用React+Three.js 封装一个三维地球">
+                使用React+Three.js 封装一个三维地球 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ruyi Zhao</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">70</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">52</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-第一站：将源码的例子跑起来"><span class="nav-number">1.</span> <span class="nav-text">1.第一站：将源码的例子跑起来</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-第二站：先拿一个例子看看"><span class="nav-number">2.</span> <span class="nav-text">2.第二站：先拿一个例子看看</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-第三站：总结一下"><span class="nav-number">3.</span> <span class="nav-text">3.第三站：总结一下</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ruyi Zhao</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

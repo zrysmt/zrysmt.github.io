@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="因为下面的内容会分模块介绍源码，所以这里为了方便，首先介绍源码的目录结构在OpenLayers 3官网的下载页面下载我们在开发工程中需要的文件(如：v3.17.1.zip)，注意如果需要编译源代码，需要下载包含编译功能的文件包：https://github.com/openlayers/ol3/releases 下载指定release版本的源码，注意是Source code (zip)或者Sour">
+<meta name="keywords" content="OpenLayers 3,地图,WebGIS,js库">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenLayers 3实践与原理探究4.1-ol3源码分析-底层基础">
+<meta property="og:url" content="https://zrysmt.github.io/2016/09/28/openlayers 3实践与原理探究4.1/index.html">
+<meta property="og:site_name" content="漫漫技术路">
+<meta property="og:description" content="因为下面的内容会分模块介绍源码，所以这里为了方便，首先介绍源码的目录结构在OpenLayers 3官网的下载页面下载我们在开发工程中需要的文件(如：v3.17.1.zip)，注意如果需要编译源代码，需要下载包含编译功能的文件包：https://github.com/openlayers/ol3/releases 下载指定release版本的源码，注意是Source code (zip)或者Sour">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/ol/ol3%E6%BA%90%E7%A0%81%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84.png">
+<meta property="og:updated_time" content="2018-11-30T03:01:09.274Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="OpenLayers 3实践与原理探究4.1-ol3源码分析-底层基础">
+<meta name="twitter:description" content="因为下面的内容会分模块介绍源码，所以这里为了方便，首先介绍源码的目录结构在OpenLayers 3官网的下载页面下载我们在开发工程中需要的文件(如：v3.17.1.zip)，注意如果需要编译源代码，需要下载包含编译功能的文件包：https://github.com/openlayers/ol3/releases 下载指定release版本的源码，注意是Source code (zip)或者Sour">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/ol/ol3%E6%BA%90%E7%A0%81%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84.png">
+
+
+
+
+
+
+  <link rel="canonical" href="https://zrysmt.github.io/2016/09/28/openlayers 3实践与原理探究4.1/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>OpenLayers 3实践与原理探究4.1-ol3源码分析-底层基础 | 漫漫技术路</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">漫漫技术路</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zrysmt.github.io/2016/09/28/openlayers 3实践与原理探究4.1/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ruyi Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="漫漫技术路">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">OpenLayers 3实践与原理探究4.1-ol3源码分析-底层基础
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2016-09-28 00:00:00" itemprop="dateCreated datePublished" datetime="2016-09-28T00:00:00+08:00">2016-09-28</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-11-30 11:01:09" itemprop="dateModified" datetime="2018-11-30T11:01:09+08:00">2018-11-30</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/WebGIS/" itemprop="url" rel="index"><span itemprop="name">WebGIS</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>因为下面的内容会分模块介绍源码，所以这里为了方便，首先介绍源码的目录结构<br>在OpenLayers 3官网的<a href="http://openlayers.org/download/" target="_blank" rel="noopener">下载页面</a>下载我们在开发工程中需要的文件(如：v3.17.1.zip)，注意如果需要编译源代码，需要下载包含编译功能的文件包：<a href="https://github.com/openlayers/ol3/releases" target="_blank" rel="noopener">https://github.com/openlayers/ol3/releases</a> 下载指定release版本的源码，注意是Source code (zip)或者Source code (tar.gz)。<br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/ol/ol3%E6%BA%90%E7%A0%81%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84.png" alt="ol3源码目录结构.png"></p>
+<ul>
+<li><code>apidoc</code>是ol3的api文档，打开<code>ol.html</code>就可以在浏览器中离线使用，当然也可以在官网中查看api；</li>
+<li><code>build</code>是ol3编译过的文件，工程开发中可以直接使用，下部分的案例是基于离线的源码的；</li>
+<li><code>closure-library</code>是google的closure库文件夹；</li>
+<li><code>css</code>里面只有<code>ol.css</code>一个文件，是定义ol3的全局样式，项目开发中需要引入；</li>
+<li><code>doc</code>提供给我们一些的案例，打开<code>quickstart.html</code>即可看到快速开始的案例；</li>
+<li><code>examples</code>是比较丰富的例子，和官网中的examples一样；</li>
+<li><code>ol</code>就是我们要分析的源码文件夹；</li>
+<li><code>ol.ext</code>是ol3所要使用的js库。</li>
+</ul>
+<p><code>ol/ol</code>文件夹下是我们分析的源码，分析基本思路：文件夹下的文件是公用的部分(A部分)，文件夹是分部分写的(B部分)。</p>
+<h1 id="0-底层基础"><a href="#0-底层基础" class="headerlink" title="0.底层基础"></a>0.底层基础</h1><h2 id="0-1-ol-js"><a href="#0-1-ol-js" class="headerlink" title="0.1 ol.js"></a>0.1 <code>ol.js</code></h2><p>第一行就可以看出，<code>ol.js</code>提供全局的第一命名空间<code>ol</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">goog.provide(<span class="string">'ol'</span>);</span><br></pre></td></tr></table></figure>
+<p>唯一的一个方法是：继承</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ol.inherits = <span class="function"><span class="keyword">function</span>(<span class="params">childCtor, parentCtor</span>) </span>&#123;</span><br><span class="line">  childCtor.prototype = <span class="built_in">Object</span>.create(parentCtor.prototype);</span><br><span class="line">  childCtor.prototype.constructor = childCtor;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="0-2-object-js"><a href="#0-2-object-js" class="headerlink" title="0.2 object.js"></a>0.2 <code>object.js</code></h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">goog.provide(<span class="string">'ol.Object'</span>);</span><br><span class="line">goog.provide(<span class="string">'ol.ObjectEvent'</span>);</span><br><span class="line">goog.provide(<span class="string">'ol.ObjectEventType'</span>);</span><br><span class="line"></span><br><span class="line">goog.require(<span class="string">'ol.Observable'</span>);</span><br><span class="line">goog.require(<span class="string">'ol.events'</span>);</span><br><span class="line">goog.require(<span class="string">'ol.events.Event'</span>);</span><br><span class="line">goog.require(<span class="string">'ol.object'</span>);</span><br></pre></td></tr></table></figure>
+<p>ol命名空间下所有的基本对象，比如<code>map</code>对象，<code>feature</code>矢量地图对象，都应该建立在<code>ol.Object</code>基础上。如：</p>
+<hr>
+<p><code>map.js</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ol.Object.call(<span class="keyword">this</span>);</span><br><span class="line">ol.inherits(ol.Map, ol.Object);</span><br></pre></td></tr></table></figure>
+<p><code>feature.js</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ol.Object.call(<span class="keyword">this</span>);</span><br><span class="line">ol.inherits(ol.Feature, ol.Object);</span><br></pre></td></tr></table></figure>
+<hr>
+<p>通过这行代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ol.inherits(ol.Object, ol.Observable);</span><br></pre></td></tr></table></figure></p>
+<p>我们发现<code>ol.Object</code>继承<code>ol.Observable</code><br><code>Observable.js</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ol.inherits(ol.Observable, ol.events.EventTarget);</span><br></pre></td></tr></table></figure>
+<p>我们发现<code>ol.Observable</code>继承<code>ol.EventTarget</code>；<br>这样，我们可以知道继承<code>ol.Object</code>后也就继承了基础事件<code>ol.events</code>。</p>
+<h2 id="0-3-events-js"><a href="#0-3-events-js" class="headerlink" title="0.3 events.js"></a>0.3 <code>events.js</code></h2><p>ol3的基础事件</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">goog.provide(<span class="string">'ol.events'</span>);</span><br><span class="line">goog.provide(<span class="string">'ol.events.EventType'</span>);</span><br><span class="line">goog.provide(<span class="string">'ol.events.KeyCode'</span>);</span><br><span class="line"></span><br><span class="line">goog.require(<span class="string">'ol.object'</span>);</span><br></pre></td></tr></table></figure>
+<p>提供的所有基础事件</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">ol.events.EventType = &#123;</span><br><span class="line">  CHANGE: <span class="string">'change'</span>,</span><br><span class="line">  CLICK: <span class="string">'click'</span>,</span><br><span class="line">  DBLCLICK: <span class="string">'dblclick'</span>,</span><br><span class="line">  DRAGENTER: <span class="string">'dragenter'</span>,</span><br><span class="line">  DRAGOVER: <span class="string">'dragover'</span>,</span><br><span class="line">  DROP: <span class="string">'drop'</span>,</span><br><span class="line">  ERROR: <span class="string">'error'</span>,</span><br><span class="line">  KEYDOWN: <span class="string">'keydown'</span>,</span><br><span class="line">  KEYPRESS: <span class="string">'keypress'</span>,</span><br><span class="line">  LOAD: <span class="string">'load'</span>,</span><br><span class="line">  MOUSEDOWN: <span class="string">'mousedown'</span>,</span><br><span class="line">  MOUSEMOVE: <span class="string">'mousemove'</span>,</span><br><span class="line">  MOUSEOUT: <span class="string">'mouseout'</span>,</span><br><span class="line">  MOUSEUP: <span class="string">'mouseup'</span>,</span><br><span class="line">  MOUSEWHEEL: <span class="string">'mousewheel'</span>,</span><br><span class="line">  MSPOINTERDOWN: <span class="string">'mspointerdown'</span>,</span><br><span class="line">  RESIZE: <span class="string">'resize'</span>,</span><br><span class="line">  TOUCHSTART: <span class="string">'touchstart'</span>,</span><br><span class="line">  TOUCHMOVE: <span class="string">'touchmove'</span>,</span><br><span class="line">  TOUCHEND: <span class="string">'touchend'</span>,</span><br><span class="line">  WHEEL: <span class="string">'wheel'</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>我们分析一下提供的几个方法</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ol.events.bindListener_ = <span class="function"><span class="keyword">function</span>(<span class="params">listenerObj</span>) </span>&#123;&#125;;</span><br><span class="line">ol.events.listen = <span class="function"><span class="keyword">function</span>(<span class="params">target, type, listener, opt_this, opt_once</span>) </span>&#123;&#125;;</span><br><span class="line">ol.events.unlisten = <span class="function"><span class="keyword">function</span>(<span class="params">target, type, listener, opt_this</span>) </span>&#123;&#125;;</span><br><span class="line">ol.events.unlistenAll = <span class="function"><span class="keyword">function</span>(<span class="params">target</span>) </span>&#123;&#125;;</span><br></pre></td></tr></table></figure>
+<p>其中方法名末尾带有”_”为私有方法，不带的为提供出去的共有方法。</p>
+<h2 id="0-4-math-js"><a href="#0-4-math-js" class="headerlink" title="0.4 math.js"></a>0.4 <code>math.js</code></h2><p>提供基础的数学运算方法，角度转化弧度函数如：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ol.math.toRadians = <span class="function"><span class="keyword">function</span>(<span class="params">angleInDegrees</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> angleInDegrees * <span class="built_in">Math</span>.PI / <span class="number">180</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="0-5-animation-js"><a href="#0-5-animation-js" class="headerlink" title="0.5 animation.js"></a>0.5 <code>animation.js</code></h2><p>提供bounce、pan、rotate、zoom四种方法</p>
+<h2 id="0-6-collection-js"><a href="#0-6-collection-js" class="headerlink" title="0.6 collection.js"></a>0.6 <code>collection.js</code></h2><p>对ol命名空间下的对象集合的操作。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">goog.provide(<span class="string">'ol.Collection'</span>);</span><br><span class="line">goog.provide(<span class="string">'ol.CollectionEvent'</span>);</span><br><span class="line">goog.provide(<span class="string">'ol.CollectionEventType'</span>);</span><br><span class="line"></span><br><span class="line">goog.require(<span class="string">'ol.events.Event'</span>);</span><br><span class="line">goog.require(<span class="string">'ol.Object'</span>);</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ol.CollectionEventType = &#123;</span><br><span class="line">  ADD: <span class="string">'add'</span></span><br><span class="line">  REMOVE: <span class="string">'remove'</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>继承</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ol.inherits(ol.CollectionEvent, ol.events.Event);</span><br><span class="line">ol.inherits(ol.Collection, ol.Object);</span><br></pre></td></tr></table></figure>
+<p>方法举例：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">ol.Collection.prototype.remove = <span class="function"><span class="keyword">function</span>(<span class="params">elem</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> arr = <span class="keyword">this</span>.array_;</span><br><span class="line">  <span class="keyword">var</span> i, ii;</span><br><span class="line">  <span class="keyword">for</span> (i = <span class="number">0</span>, ii = arr.length; i &lt; ii; ++i) &#123;</span><br><span class="line">    <span class="keyword">if</span> (arr[i] === elem) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">this</span>.removeAt(i);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">undefined</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="0-7-uri-js"><a href="#0-7-uri-js" class="headerlink" title="0.7 uri.js"></a>0.7 <code>uri.js</code></h2><p>通过url加载地图，其中<code>params</code>包含请求地图的宽、高、分辨率、地图范围</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">ol.uri.appendParams = <span class="function"><span class="keyword">function</span>(<span class="params">uri, params</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> qs = <span class="built_in">Object</span>.keys(params).map(<span class="function"><span class="keyword">function</span>(<span class="params">k</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> k + <span class="string">'='</span> + <span class="built_in">encodeURIComponent</span>(params[k]);</span><br><span class="line">  &#125;).join(<span class="string">'&amp;'</span>);</span><br><span class="line">  <span class="comment">// remove any trailing ? or &amp;</span></span><br><span class="line">  uri = uri.replace(<span class="regexp">/[?&amp;]$/</span>, <span class="string">''</span>);</span><br><span class="line">  <span class="comment">// append ? or &amp; depending on whether uri has existing parameters</span></span><br><span class="line">  uri = uri.indexOf(<span class="string">'?'</span>) === <span class="number">-1</span> ? uri + <span class="string">'?'</span> : uri + <span class="string">'&amp;'</span>;</span><br><span class="line">  <span class="keyword">return</span> uri + qs;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/OpenLayers-3/" rel="tag"># OpenLayers 3</a>
+          
+            <a href="/tags/地图/" rel="tag"># 地图</a>
+          
+            <a href="/tags/WebGIS/" rel="tag"># WebGIS</a>
+          
+            <a href="/tags/js库/" rel="tag"># js库</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/09/28/openlayers 3实践与原理探究4.4/" rel="next" title="OpenLayers 3实践与原理探究4.4-ol3源码分析-render">
+                <i class="fa fa-chevron-left"></i> OpenLayers 3实践与原理探究4.4-ol3源码分析-render
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/09/28/WebRTC1-原理探究/" rel="prev" title="WebRTC1-原理探究">
+                WebRTC1-原理探究 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ruyi Zhao</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">70</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">52</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0-底层基础"><span class="nav-number">1.</span> <span class="nav-text">0.底层基础</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#0-1-ol-js"><span class="nav-number">1.1.</span> <span class="nav-text">0.1 ol.js</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0-2-object-js"><span class="nav-number">1.2.</span> <span class="nav-text">0.2 object.js</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0-3-events-js"><span class="nav-number">1.3.</span> <span class="nav-text">0.3 events.js</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0-4-math-js"><span class="nav-number">1.4.</span> <span class="nav-text">0.4 math.js</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0-5-animation-js"><span class="nav-number">1.5.</span> <span class="nav-text">0.5 animation.js</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0-6-collection-js"><span class="nav-number">1.6.</span> <span class="nav-text">0.6 collection.js</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#0-7-uri-js"><span class="nav-number">1.7.</span> <span class="nav-text">0.7 uri.js</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ruyi Zhao</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

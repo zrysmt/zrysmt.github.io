@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="前面几节的内容介绍了Map,View,Source,Layer,这些其实我们都是要么在对象属性中设置 ，要么是通过方法设置，实质上是通过共享的全局变量设置地图包含的图层，地图的显示效果，但是如果真正上绘制在浏览器上，需要渲染在canvas(ol3常用的渲染方式). 由于源码代码量比较大，这里只是从大部分介绍流程。网上有人(OpenLayers 3源码那些事)总结一张图的不错，这里拿来用一下 0.从">
+<meta name="keywords" content="OpenLayers 3,地图,WebGIS,js库">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OpenLayers 3实践与原理探究4.4-ol3源码分析-render">
+<meta property="og:url" content="https://zrysmt.github.io/2016/09/28/openlayers 3实践与原理探究4.4/index.html">
+<meta property="og:site_name" content="漫漫技术路">
+<meta property="og:description" content="前面几节的内容介绍了Map,View,Source,Layer,这些其实我们都是要么在对象属性中设置 ，要么是通过方法设置，实质上是通过共享的全局变量设置地图包含的图层，地图的显示效果，但是如果真正上绘制在浏览器上，需要渲染在canvas(ol3常用的渲染方式). 由于源码代码量比较大，这里只是从大部分介绍流程。网上有人(OpenLayers 3源码那些事)总结一张图的不错，这里拿来用一下 0.从">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/ol/ol3%E6%B8%B2%E6%9F%93%E6%B5%81%E7%A8%8B.png">
+<meta property="og:updated_time" content="2018-11-30T03:01:09.300Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="OpenLayers 3实践与原理探究4.4-ol3源码分析-render">
+<meta name="twitter:description" content="前面几节的内容介绍了Map,View,Source,Layer,这些其实我们都是要么在对象属性中设置 ，要么是通过方法设置，实质上是通过共享的全局变量设置地图包含的图层，地图的显示效果，但是如果真正上绘制在浏览器上，需要渲染在canvas(ol3常用的渲染方式). 由于源码代码量比较大，这里只是从大部分介绍流程。网上有人(OpenLayers 3源码那些事)总结一张图的不错，这里拿来用一下 0.从">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/ol/ol3%E6%B8%B2%E6%9F%93%E6%B5%81%E7%A8%8B.png">
+
+
+
+
+
+
+  <link rel="canonical" href="https://zrysmt.github.io/2016/09/28/openlayers 3实践与原理探究4.4/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>OpenLayers 3实践与原理探究4.4-ol3源码分析-render | 漫漫技术路</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">漫漫技术路</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zrysmt.github.io/2016/09/28/openlayers 3实践与原理探究4.4/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ruyi Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="漫漫技术路">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">OpenLayers 3实践与原理探究4.4-ol3源码分析-render
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2016-09-28 00:00:00" itemprop="dateCreated datePublished" datetime="2016-09-28T00:00:00+08:00">2016-09-28</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-11-30 11:01:09" itemprop="dateModified" datetime="2018-11-30T11:01:09+08:00">2018-11-30</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/WebGIS/" itemprop="url" rel="index"><span itemprop="name">WebGIS</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>前面几节的内容介绍了<code>Map</code>,<code>View</code>,<code>Source</code>,<code>Layer</code>,这些其实我们都是要么在对象属性中设置 ，要么是通过方法设置，实质上是通过共享的全局变量设置地图包含的图层，地图的显示效果，但是如果真正上绘制在浏览器上，需要渲染在canvas(ol3常用的渲染方式).</p>
+<p>由于源码代码量比较大，这里只是从大部分介绍流程。<br>网上有人(OpenLayers 3源码那些事)总结一张图的不错，这里拿来用一下<br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/ol/ol3%E6%B8%B2%E6%9F%93%E6%B5%81%E7%A8%8B.png" alt="ol3渲染流程"></p>
+<h1 id="0-从map-js开始"><a href="#0-从map-js开始" class="headerlink" title="0.从map.js开始"></a>0.从<code>map.js</code>开始</h1><ul>
+<li><strong>1) render/renderSync</strong><br>具体流程用注释的形式标出</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//renderSync是异步的，同样道理</span></span><br><span class="line">ol.Map.prototype.render = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">this</span>.animationDelayKey_ === <span class="literal">undefined</span>) &#123;</span><br><span class="line">    <span class="keyword">this</span>.animationDelayKey_ = ol.global.requestAnimationFrame(</span><br><span class="line">        <span class="keyword">this</span>.animationDelay_);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>2) animationDelay_</strong></li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">this</span>.animationDelay_ = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.animationDelayKey_ = <span class="literal">undefined</span>;</span><br><span class="line">    <span class="keyword">this</span>.renderFrame_.call(<span class="keyword">this</span>, <span class="built_in">Date</span>.now());</span><br><span class="line">  &#125;.bind(<span class="keyword">this</span>);</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>3) renderFrame_</strong></li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></td><td class="code"><pre><span class="line">ol.Map.prototype.renderFrame_ = <span class="function"><span class="keyword">function</span>(<span class="params">time</span>) </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> i, ii, viewState;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">var</span> size = <span class="keyword">this</span>.getSize();</span><br><span class="line">  <span class="keyword">var</span> view = <span class="keyword">this</span>.getView();</span><br><span class="line">  <span class="keyword">var</span> extent = ol.extent.createEmpty();</span><br><span class="line">  <span class="comment">/** @type &#123;?olx.FrameState&#125; */</span></span><br><span class="line">  <span class="keyword">var</span> frameState = <span class="literal">null</span>;</span><br><span class="line">  <span class="keyword">if</span> (size !== <span class="literal">undefined</span> &amp;&amp; ol.size.hasArea(size) &amp;&amp; view &amp;&amp; view.isDef()) &#123;</span><br><span class="line">    <span class="keyword">var</span> viewHints = view.getHints(<span class="keyword">this</span>.frameState_ ? <span class="keyword">this</span>.frameState_.viewHints : <span class="literal">undefined</span>);</span><br><span class="line">    <span class="keyword">var</span> layerStatesArray = <span class="keyword">this</span>.getLayerGroup().getLayerStatesArray();</span><br><span class="line">    <span class="keyword">var</span> layerStates = &#123;&#125;;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>, ii = layerStatesArray.length; i &lt; ii; ++i) &#123;</span><br><span class="line">      layerStates[goog.getUid(layerStatesArray[i].layer)] = layerStatesArray[i];</span><br><span class="line">    &#125;</span><br><span class="line">    viewState = view.getState();</span><br><span class="line">    frameState = <span class="comment">/** @type &#123;olx.FrameState&#125; */</span> (&#123;      <span class="comment">//1.准备frameState</span></span><br><span class="line">      animate: <span class="literal">false</span>,</span><br><span class="line">      attributions: &#123;&#125;,</span><br><span class="line">      coordinateToPixelMatrix: <span class="keyword">this</span>.coordinateToPixelMatrix_,</span><br><span class="line">      extent: extent,</span><br><span class="line">      focus: !<span class="keyword">this</span>.focus_ ? viewState.center : <span class="keyword">this</span>.focus_,</span><br><span class="line">      index: <span class="keyword">this</span>.frameIndex_++,</span><br><span class="line">      layerStates: layerStates,<span class="comment">//layer的常量属性，通过共享作为全局变量</span></span><br><span class="line">      layerStatesArray: layerStatesArray,</span><br><span class="line">      logos: ol.object.assign(&#123;&#125;, <span class="keyword">this</span>.logos_),</span><br><span class="line">      pixelRatio: <span class="keyword">this</span>.pixelRatio_,</span><br><span class="line">      pixelToCoordinateMatrix: <span class="keyword">this</span>.pixelToCoordinateMatrix_,</span><br><span class="line">      postRenderFunctions: [],</span><br><span class="line">      size: size,</span><br><span class="line">      skippedFeatureUids: <span class="keyword">this</span>.skippedFeatureUids_,</span><br><span class="line">      tileQueue: <span class="keyword">this</span>.tileQueue_,</span><br><span class="line">      time: time,</span><br><span class="line">      usedTiles: &#123;&#125;,</span><br><span class="line">      viewState: viewState,<span class="comment">//view的常量属性，通过共享作为全局变量</span></span><br><span class="line">      viewHints: viewHints,</span><br><span class="line">      wantedTiles: &#123;&#125;</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (frameState) &#123;</span><br><span class="line">    <span class="keyword">var</span> preRenderFunctions = <span class="keyword">this</span>.preRenderFunctions_;<span class="comment">//2.渲染前</span></span><br><span class="line">    <span class="keyword">var</span> n = <span class="number">0</span>, preRenderFunction;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>, ii = preRenderFunctions.length; i &lt; ii; ++i) &#123;</span><br><span class="line">      preRenderFunction = preRenderFunctions[i];</span><br><span class="line">      <span class="keyword">if</span> (preRenderFunction(<span class="keyword">this</span>, frameState)) &#123;</span><br><span class="line">        preRenderFunctions[n++] = preRenderFunction;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    preRenderFunctions.length = n;</span><br><span class="line"></span><br><span class="line">    frameState.extent = ol.extent.getForViewAndSize(viewState.center,</span><br><span class="line">        viewState.resolution, viewState.rotation, frameState.size, extent);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">this</span>.frameState_ = frameState;</span><br><span class="line">  <span class="keyword">this</span>.renderer_.renderFrame(frameState);                <span class="comment">//3.渲染</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (frameState) &#123;</span><br><span class="line">    <span class="keyword">if</span> (frameState.animate) &#123;</span><br><span class="line">      <span class="keyword">this</span>.render();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">Array</span>.prototype.push.apply(</span><br><span class="line">        <span class="keyword">this</span>.postRenderFunctions_, frameState.postRenderFunctions);<span class="comment">//4.渲染后</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> idle = <span class="keyword">this</span>.preRenderFunctions_.length === <span class="number">0</span> &amp;&amp;</span><br><span class="line">        !frameState.viewHints[ol.ViewHint.ANIMATING] &amp;&amp;</span><br><span class="line">        !frameState.viewHints[ol.ViewHint.INTERACTING] &amp;&amp;</span><br><span class="line">        !ol.extent.equals(frameState.extent, <span class="keyword">this</span>.previousExtent_);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (idle) &#123;</span><br><span class="line">      <span class="keyword">this</span>.dispatchEvent(</span><br><span class="line">          <span class="keyword">new</span> ol.MapEvent(ol.MapEventType.MOVEEND, <span class="keyword">this</span>, frameState));</span><br><span class="line">      ol.extent.clone(frameState.extent, <span class="keyword">this</span>.previousExtent_);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">this</span>.dispatchEvent(</span><br><span class="line">      <span class="keyword">new</span> ol.MapEvent(ol.MapEventType.POSTRENDER, <span class="keyword">this</span>, frameState));</span><br><span class="line"></span><br><span class="line">  goog.async.nextTick(<span class="keyword">this</span>.handlePostRender, <span class="keyword">this</span>);</span><br><span class="line"></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p><strong>下面讲诉的渲染的第3步 <code>renderFrame(frameState)</code></strong><br>有关渲染的源代码在<code>ol/ol/render</code>,<code>ol/ol/renderer</code>下。<br><code>ol/ol/render</code>文件夹下是渲染的基本属性和方法，利用设计模式中的工厂模式，用来构造<code>ol/ol/renderer</code>。</p>
+<h1 id="1-渲染Map"><a href="#1-渲染Map" class="headerlink" title="1.渲染Map"></a>1.渲染Map</h1><p><code>ol/ol/renderer/maprenderer.js</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ol.renderer.Map = <span class="function"><span class="keyword">function</span>(<span class="params">container, map</span>) </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>这只是个父类，具体实现类位置在：<br><code>ol/ol/renderer/canvas/canvasmaprenderer.js</code>–ol.render.canvas.Map(默认)<br><code>ol/ol/renderer/canvas/webglmaprenderer.js</code>–ol.render.webgl.Map<br><code>ol/ol/renderer/canvas/dommaprenderer.js</code>–ol.render.dom.Map</p>
+<p>主要介绍第一种<code>ol/ol/renderer/canvas/canvasmaprenderer.js</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">ol.renderer.canvas.Map = <span class="function"><span class="keyword">function</span>(<span class="params">container, map</span>) </span>&#123;</span><br><span class="line">	ol.renderer.Map.call(<span class="keyword">this</span>, container, map);</span><br><span class="line">	<span class="keyword">this</span>.context_ = ol.dom.createCanvasContext2D();</span><br><span class="line"></span><br><span class="line">	  <span class="keyword">this</span>.canvas_ = <span class="keyword">this</span>.context_.canvas;</span><br><span class="line"></span><br><span class="line">	  <span class="keyword">this</span>.canvas_.style.width = <span class="string">'100%'</span>;</span><br><span class="line">	  <span class="keyword">this</span>.canvas_.style.height = <span class="string">'100%'</span>;</span><br><span class="line">	  <span class="keyword">this</span>.canvas_.className = ol.css.CLASS_UNSELECTABLE;</span><br><span class="line">	  container.insertBefore(<span class="keyword">this</span>.canvas_, container.childNodes[<span class="number">0</span>] || <span class="literal">null</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>渲染逻辑<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ol.renderer.canvas.Map.prototype.renderFrame = <span class="function"><span class="keyword">function</span>(<span class="params">frameState</span>) </span>&#123;&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="2-渲染Layer"><a href="#2-渲染Layer" class="headerlink" title="2.渲染Layer"></a>2.渲染Layer</h1><p><code>ol/ol/renderer/layerrenderer.js</code></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ol.renderer.Layer = <span class="function"><span class="keyword">function</span>(<span class="params">layer</span>) </span>&#123;</span><br><span class="line"></span><br><span class="line">  ol.Observable.call(<span class="keyword">this</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">this</span>.layer_ = layer;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>这只是个父类，具体实现类位置在：<br><code>ol/ol/renderer/canvas/canvaslayerrenderer.js</code>–ol.render.canvas.Layer(默认)<br><code>ol/ol/renderer/canvas/webgllayerrenderer.js</code>–ol.render.webgl.Layer<br><code>ol/ol/renderer/canvas/domlayerrenderer.js</code>–ol.render.dom.Layer</p>
+<p>主要介绍第一种ol.render.canvas.Layer(默认)：<br>这个类又分为三种类型：</p>
+<ul>
+<li>ol.render.canvas.TileLayer</li>
+<li>ol.render.canvas.VectorLayer</li>
+<li>ol.render.canvas.VectorTileLayer</li>
+</ul>
+<p><code>ol.render.canvas.TileLayer</code>渲染逻辑</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">ol.renderer.canvas.TileLayer.prototype.prepareFrame = <span class="function"><span class="keyword">function</span>(<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">    frameState, layerState</span>) </span>&#123;&#125;    <span class="comment">//第一步</span></span><br><span class="line">ol.renderer.canvas.TileLayer.prototype.composeFrame = <span class="function"><span class="keyword">function</span>(<span class="params"><span class="regexp">//</span>第二步</span></span></span><br><span class="line"><span class="function"><span class="params">    frameState, layerState, context</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> transform = <span class="keyword">this</span>.getTransform(frameState, <span class="number">0</span>);</span><br><span class="line">  <span class="keyword">this</span>.dispatchPreComposeEvent(context, frameState, transform);</span><br><span class="line">  <span class="keyword">this</span>.renderTileImages(context, frameState, layerState);</span><br><span class="line">  <span class="keyword">this</span>.dispatchPostComposeEvent(context, frameState, transform);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">ol.renderer.canvas.TileLayer.prototype.renderTileImages = <span class="function"><span class="keyword">function</span>(<span class="params">context, frameState, layerState</span>) </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>参考文献：</p>
+<ul>
+<li><a href="http://www.jianshu.com/p/573cde18575a" target="_blank" rel="noopener">OpenLayers 3源码解析视频</a></li>
+<li><a href="https://www.google.com.hk/url?sa=t&amp;rct=j&amp;q=&amp;esrc=s&amp;source=web&amp;cd=4&amp;ved=0ahUKEwjV852YrvDNAhVEQo8KHbbAAzwQFgg0MAM&amp;url=%68%74%74%70%3a%2f%2f%77%65%69%6c%69%6e%2e%6d%65%2f%64%6f%63%2f%4f%70%65%6e%4c%61%79%65%72%73%25%32%30%33%25%45%36%25%42%41%25%39%30%25%45%37%25%41%30%25%38%31%25%45%39%25%38%32%25%41%33%25%45%34%25%42%41%25%39%42%25%45%34%25%42%41%25%38%42%28%25%45%34%25%42%38%25%38%41%29%2e%64%6f%63%78&amp;usg=AFQjCNHRsX5ZW6MBpwJUCSEZgOuR7NL4Rw" target="_blank" rel="noopener">OpenLayers 3源码那些事(上)</a></li>
+<li><a href="http://weilin.me/ol3-shares/source-explain-2/" target="_blank" rel="noopener">OpenLayers 3源码那些事(下)</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/OpenLayers-3/" rel="tag"># OpenLayers 3</a>
+          
+            <a href="/tags/地图/" rel="tag"># 地图</a>
+          
+            <a href="/tags/WebGIS/" rel="tag"># WebGIS</a>
+          
+            <a href="/tags/js库/" rel="tag"># js库</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/09/28/webpack基础实践1/" rel="next" title="webpack基础实践1">
+                <i class="fa fa-chevron-left"></i> webpack基础实践1
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/09/28/openlayers 3实践与原理探究4.1/" rel="prev" title="OpenLayers 3实践与原理探究4.1-ol3源码分析-底层基础">
+                OpenLayers 3实践与原理探究4.1-ol3源码分析-底层基础 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ruyi Zhao</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">70</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">52</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0-从map-js开始"><span class="nav-number">1.</span> <span class="nav-text">0.从map.js开始</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-渲染Map"><span class="nav-number">2.</span> <span class="nav-text">1.渲染Map</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-渲染Layer"><span class="nav-number">3.</span> <span class="nav-text">2.渲染Layer</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ruyi Zhao</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

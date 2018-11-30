@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="leaflet-viz–Leaflet可视化平台  https://github.com/zrysmt/leaflet-viz  leaflet是一个开源的前端地图交互类库，比较轻量级，支持移动端。而且有丰富的插件资源可供我们使用。 Echarts是百度开源的前端可视化类库，提供丰富的前端可视化图表，平台中重要的一部分是我们要将leaflet和Echarts结合在一起。 该平台是基于leaflet">
+<meta name="keywords" content="FE,WebGIS,leaflet,Echarts">
+<meta property="og:type" content="article">
+<meta property="og:title" content="leaflet可视化平台搭建">
+<meta property="og:url" content="https://zrysmt.github.io/2017/05/22/leaflet可视化平台搭建/index.html">
+<meta property="og:site_name" content="漫漫技术路">
+<meta property="og:description" content="leaflet-viz–Leaflet可视化平台  https://github.com/zrysmt/leaflet-viz  leaflet是一个开源的前端地图交互类库，比较轻量级，支持移动端。而且有丰富的插件资源可供我们使用。 Echarts是百度开源的前端可视化类库，提供丰富的前端可视化图表，平台中重要的一部分是我们要将leaflet和Echarts结合在一起。 该平台是基于leaflet">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/leaflet/1-1.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/leaflet/1-2.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/leaflet/1-3.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/leaflet/1-4.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/leaflet/1-5.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/leaflet/1-6.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/leaflet/1-7.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/leaflet/1-8.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/leaflet/1-9.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/leaflet/1-10.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/leaflet/1-11.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/leaflet/1-12.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/leaflet/1-13.jpg">
+<meta property="og:updated_time" content="2018-11-30T02:40:53.158Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="leaflet可视化平台搭建">
+<meta name="twitter:description" content="leaflet-viz–Leaflet可视化平台  https://github.com/zrysmt/leaflet-viz  leaflet是一个开源的前端地图交互类库，比较轻量级，支持移动端。而且有丰富的插件资源可供我们使用。 Echarts是百度开源的前端可视化类库，提供丰富的前端可视化图表，平台中重要的一部分是我们要将leaflet和Echarts结合在一起。 该平台是基于leaflet">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/zrysmt/mdPics/master/leaflet/1-1.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="https://zrysmt.github.io/2017/05/22/leaflet可视化平台搭建/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>leaflet可视化平台搭建 | 漫漫技术路</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">漫漫技术路</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zrysmt.github.io/2017/05/22/leaflet可视化平台搭建/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ruyi Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="漫漫技术路">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">leaflet可视化平台搭建
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-05-22 20:27:57" itemprop="dateCreated datePublished" datetime="2017-05-22T20:27:57+08:00">2017-05-22</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-11-30 10:40:53" itemprop="dateModified" datetime="2018-11-30T10:40:53+08:00">2018-11-30</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/WebGIS/" itemprop="url" rel="index"><span itemprop="name">WebGIS</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong><a href="https://github.com/zrysmt/leaflet-viz" target="_blank" rel="noopener">leaflet-viz–Leaflet可视化平台</a></strong></p>
+<blockquote>
+<p><a href="https://github.com/zrysmt/leaflet-viz" target="_blank" rel="noopener">https://github.com/zrysmt/leaflet-viz</a></p>
+</blockquote>
+<p><a href="http://leafletjs.com/index.html" target="_blank" rel="noopener">leaflet</a>是一个开源的前端地图交互类库，比较轻量级，支持移动端。而且有丰富的<a href="http://leafletjs.com/plugins.html" target="_blank" rel="noopener">插件资源</a>可供我们使用。</p>
+<p><a href="http://echarts.baidu.com/" target="_blank" rel="noopener">Echarts</a>是百度开源的前端可视化类库，提供丰富的前端可视化图表，平台中重要的一部分是我们要将leaflet和Echarts结合在一起。</p>
+<p>该平台是基于leaflet及其插件搭建的一个方便可用的可视化平台。详细参见[示例Demo]。(<a href="https://zrysmt.github.io/demo/leaflet-demo/">https://zrysmt.github.io/demo/leaflet-demo/</a>)</p>
+<h2 id="1-安装与编译"><a href="#1-安装与编译" class="headerlink" title="1. 安装与编译"></a>1. 安装与编译</h2><ul>
+<li><strong>安装</strong></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>编译</strong></li>
+</ul>
+<p><strong>debug模式</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm run dev</span><br></pre></td></tr></table></figure>
+<p><strong>输出</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm run build</span><br></pre></td></tr></table></figure>
+<h2 id="2-示例简介"><a href="#2-示例简介" class="headerlink" title="2.示例简介"></a>2.示例简介</h2><p>示例地址：<a href="https://zrysmt.github.io/demo/leaflet-demo/">https://zrysmt.github.io/demo/leaflet-demo/</a><br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/leaflet/1-1.jpg" alt=""><br>示例包含最基本的GIS功能和可视化Demo</p>
+<h2 id="3-基础的GIS功能"><a href="#3-基础的GIS功能" class="headerlink" title="3.基础的GIS功能"></a>3.基础的GIS功能</h2><ul>
+<li>拖放、全图、定位、打印出图片、打印出PDF功能。<br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/leaflet/1-2.png" alt=""></li>
+<li>地图缩放、比例尺显示功能</li>
+<li>测量面积和距离功能</li>
+<li>图层切换，提供丰富的图层切换<br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/leaflet/1-3.png" alt=""></li>
+<li>地图搜索功能</li>
+<li>基础绘图功能<br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/leaflet/1-4.png" alt=""></li>
+</ul>
+<h2 id="4-可视化示例"><a href="#4-可视化示例" class="headerlink" title="4.可视化示例"></a>4.可视化示例</h2><p><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/leaflet/1-5.png" alt=""></p>
+<ul>
+<li><strong>热力图</strong></li>
+</ul>
+<p>引入：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">import &apos;../common/leaflet-plugin/HeatLayer.js&apos;;</span><br></pre></td></tr></table></figure></p>
+<p>使用：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> heat = L.heatLayer([</span><br><span class="line">    [<span class="number">50.5</span>, <span class="number">30.5</span>, <span class="number">0.2</span>], <span class="comment">// lat, lng, intensity</span></span><br><span class="line">    [<span class="number">50.6</span>, <span class="number">30.4</span>, <span class="number">0.5</span>],</span><br><span class="line">...</span><br><span class="line">], &#123;<span class="attr">radius</span>: <span class="number">25</span>&#125;).addTo(map)</span><br></pre></td></tr></table></figure></p>
+<p><strong>效果图</strong>：<br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/leaflet/1-6.jpg" alt=""></p>
+<ul>
+<li><strong>结合Echarts</strong></li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> overlay = <span class="keyword">new</span> L.echartsLayer3(map, echarts);</span><br><span class="line"><span class="keyword">let</span> chartsContainer = overlay.getEchartsContainer();</span><br><span class="line"><span class="keyword">let</span> myChart = overlay.initECharts(chartsContainer);</span><br><span class="line"><span class="built_in">window</span>.onresize = myChart.onresize;</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"chartsContainer:"</span>, chartsContainer);</span><br><span class="line"><span class="keyword">if</span> (type == <span class="string">"qianxi"</span>) &#123;</span><br><span class="line">    overlay.setOption(ecOption);</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (type == <span class="string">"scatter"</span>) &#123;</span><br><span class="line">    overlay.setOption(scatterOption);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>迁徙图</strong>（选择了高德卫星底图）<br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/leaflet/1-7.jpg" alt=""><br><strong>散点图</strong>（选择了Geoq午夜蓝底图）<br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/leaflet/1-8.jpg" alt=""></p>
+<ul>
+<li><strong>DivIcon结合Echarts</strong></li>
+</ul>
+<p>这个方案不太适合大数据量的渲染。<br>我写了两个简单的功能函数，一个用来渲染可视化图（echartsIcon），一个专门用来渲染图例（echartsLegend）。<br><strong>效果图</strong>（底图选择了为google底图）<br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/leaflet/1-9.jpg" alt=""><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> echartsIcon <span class="keyword">from</span> <span class="string">'../common/plugin/echartsIcon.js'</span>; <span class="comment">//echartsLegend</span></span><br><span class="line"><span class="keyword">import</span> echartsLegend <span class="keyword">from</span> <span class="string">'../common/plugin/echartsLegend.js'</span>; <span class="comment">//echartsLegend</span></span><br></pre></td></tr></table></figure></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> option = &#123;</span><br><span class="line">    tooltip: &#123;</span><br><span class="line">        trigger: <span class="string">'item'</span>,</span><br><span class="line">        formatter: <span class="string">"&#123;a&#125; &lt;br/&gt;&#123;b&#125; : &#123;c&#125; (&#123;d&#125;%)"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    series: [&#123;</span><br><span class="line">        name: <span class="string">'访问来源'</span>,</span><br><span class="line">        type: <span class="string">'pie'</span>,</span><br><span class="line">        radius: <span class="string">'55%'</span>,</span><br><span class="line">        center: [<span class="string">'50%'</span>, <span class="string">'50%'</span>],</span><br><span class="line">        label: &#123;</span><br><span class="line">            normal: &#123;</span><br><span class="line">                show: <span class="literal">false</span></span><br><span class="line">            &#125;,</span><br><span class="line">            emphasis: &#123;</span><br><span class="line">                show: <span class="literal">false</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        lableLine: &#123;</span><br><span class="line">            normal: &#123;</span><br><span class="line">                show: <span class="literal">false</span></span><br><span class="line">            &#125;,</span><br><span class="line">            emphasis: &#123;</span><br><span class="line">                show: <span class="literal">false</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        itemStyle: &#123;</span><br><span class="line">            emphasis: &#123;</span><br><span class="line">                shadowBlur: <span class="number">10</span>,</span><br><span class="line">                shadowOffsetX: <span class="number">0</span>,</span><br><span class="line">                shadowColor: <span class="string">'rgba(0, 0, 0, 0.5)'</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;]</span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">//经纬度不能相同</span></span><br><span class="line"><span class="keyword">let</span> latlngs = [</span><br><span class="line">    [<span class="number">30</span>, <span class="number">104</span>],</span><br><span class="line">    [<span class="number">31</span>, <span class="number">110</span>],</span><br><span class="line">    [<span class="number">34</span>, <span class="number">120</span>]</span><br><span class="line">];</span><br><span class="line">option.datas = [</span><br><span class="line">    [</span><br><span class="line">        &#123; <span class="attr">value</span>: <span class="number">335</span>, <span class="attr">name</span>: <span class="string">'直接访问'</span> &#125;,</span><br><span class="line">        &#123; <span class="attr">value</span>: <span class="number">310</span>, <span class="attr">name</span>: <span class="string">'邮件营销'</span> &#125;,</span><br><span class="line">        &#123; <span class="attr">value</span>: <span class="number">234</span>, <span class="attr">name</span>: <span class="string">'联盟广告'</span> &#125;,</span><br><span class="line">        &#123; <span class="attr">value</span>: <span class="number">135</span>, <span class="attr">name</span>: <span class="string">'视频广告'</span> &#125;,</span><br><span class="line">        &#123; <span class="attr">value</span>: <span class="number">1548</span>, <span class="attr">name</span>: <span class="string">'搜索引擎'</span> &#125;</span><br><span class="line">    ],</span><br><span class="line">    [</span><br><span class="line">        &#123; <span class="attr">value</span>: <span class="number">345</span>, <span class="attr">name</span>: <span class="string">'直接访问'</span> &#125;,</span><br><span class="line">        &#123; <span class="attr">value</span>: <span class="number">410</span>, <span class="attr">name</span>: <span class="string">'邮件营销'</span> &#125;,</span><br><span class="line">        &#123; <span class="attr">value</span>: <span class="number">244</span>, <span class="attr">name</span>: <span class="string">'联盟广告'</span> &#125;,</span><br><span class="line">        &#123; <span class="attr">value</span>: <span class="number">145</span>, <span class="attr">name</span>: <span class="string">'视频广告'</span> &#125;,</span><br><span class="line">        &#123; <span class="attr">value</span>: <span class="number">548</span>, <span class="attr">name</span>: <span class="string">'搜索引擎'</span> &#125;</span><br><span class="line">    ],</span><br><span class="line">    [</span><br><span class="line">        &#123; <span class="attr">value</span>: <span class="number">445</span>, <span class="attr">name</span>: <span class="string">'直接访问'</span> &#125;,</span><br><span class="line">        &#123; <span class="attr">value</span>: <span class="number">410</span>, <span class="attr">name</span>: <span class="string">'邮件营销'</span> &#125;,</span><br><span class="line">        &#123; <span class="attr">value</span>: <span class="number">244</span>, <span class="attr">name</span>: <span class="string">'联盟广告'</span> &#125;,</span><br><span class="line">        &#123; <span class="attr">value</span>: <span class="number">145</span>, <span class="attr">name</span>: <span class="string">'视频广告'</span> &#125;,</span><br><span class="line">        &#123; <span class="attr">value</span>: <span class="number">148</span>, <span class="attr">name</span>: <span class="string">'搜索引擎'</span> &#125;</span><br><span class="line">    ],</span><br><span class="line">];</span><br><span class="line">echartsIcon(map, latlngs, option);</span><br><span class="line"><span class="comment">//图例</span></span><br><span class="line"><span class="keyword">let</span> legendOption = &#123;</span><br><span class="line">    orient: <span class="string">'vertical'</span>,</span><br><span class="line">    left: <span class="string">'left'</span>,</span><br><span class="line">    width: <span class="string">"90px"</span>,</span><br><span class="line">    height: <span class="string">"140px"</span>,</span><br><span class="line">    data: [<span class="string">'直接访问'</span>, <span class="string">'邮件营销'</span>, <span class="string">'联盟广告'</span>, <span class="string">'视频广告'</span>, <span class="string">'搜索引擎'</span>]</span><br><span class="line">&#125;;</span><br><span class="line">echartsLegend(map, legendOption);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>leaflet-dvf</li>
+</ul>
+<p><a href="https://github.com/humangeo/leaflet-dvf" target="_blank" rel="noopener">leaflet-dvf</a>是一个基于leaflet的数据可视化框架，提供有比较多的可视化图形。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">"../common/leaflet-plugin/Leaflet.dvf/css/dvf.css"</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">"leaflet-dvf"</span>;</span><br></pre></td></tr></table></figure></p>
+<p><strong>地震图：</strong><br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/leaflet/1-10.jpg" alt=""><br><strong>收入水平图：</strong><br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/leaflet/1-11.jpg" alt=""><br>需要的数据<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> earthquakesData <span class="keyword">from</span> <span class="string">'../data/earthquakes.json'</span>;</span><br><span class="line"><span class="keyword">import</span> countryData <span class="keyword">from</span> <span class="string">'../data/countryData.js'</span>;</span><br></pre></td></tr></table></figure></p>
+<p><strong>地震图代码：</strong><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> lastLayer;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> eqfeed_callback = <span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Initialize framework linear functions for mapping earthquake data properties to Leaflet style properties</span></span><br><span class="line">    <span class="comment">// Color scale - green to red using the basic HSLHueFunction</span></span><br><span class="line">    <span class="keyword">let</span> magnitudeColorFunction = <span class="keyword">new</span> L.HSLHueFunction(<span class="keyword">new</span> L.Point(<span class="number">0</span>, <span class="number">90</span>), <span class="keyword">new</span> L.Point(<span class="number">10</span>, <span class="number">0</span>), &#123; <span class="attr">outputSaturation</span>: <span class="string">'100%'</span>, <span class="attr">outputLuminosity</span>: <span class="string">'25%'</span>, <span class="attr">postProcess</span>: <span class="literal">null</span> &#125;);</span><br><span class="line">    <span class="keyword">let</span> magnitudeFillColorFunction = <span class="keyword">new</span> L.HSLHueFunction(<span class="keyword">new</span> L.Point(<span class="number">0</span>, <span class="number">90</span>), <span class="keyword">new</span> L.Point(<span class="number">10</span>, <span class="number">0</span>), &#123; <span class="attr">outputSaturation</span>: <span class="string">'100%'</span>, <span class="attr">outputLuminosity</span>: <span class="string">'50%'</span>, <span class="attr">postProcess</span>: <span class="literal">null</span> &#125;);</span><br><span class="line">    <span class="keyword">let</span> magnitudeRadiusFunction = <span class="keyword">new</span> L.LinearFunction(<span class="keyword">new</span> L.Point(<span class="number">0</span>, <span class="number">10</span>), <span class="keyword">new</span> L.Point(<span class="number">10</span>, <span class="number">30</span>), &#123; <span class="attr">postProcess</span>: <span class="literal">null</span> &#125;);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">let</span> now = <span class="built_in">Math</span>.round((<span class="keyword">new</span> <span class="built_in">Date</span>()).getTime());</span><br><span class="line">    <span class="keyword">let</span> start = now - <span class="number">86400000</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Initialize a linear function to map earthquake time to opacity</span></span><br><span class="line">    <span class="keyword">let</span> timeOpacityFunction = <span class="keyword">new</span> L.LinearFunction(<span class="keyword">new</span> L.Point(start, <span class="number">0.3</span>), <span class="keyword">new</span> L.Point(now, <span class="number">1</span>));</span><br><span class="line">    <span class="keyword">let</span> fontSizeFunction = <span class="keyword">new</span> L.LinearFunction(<span class="keyword">new</span> L.Point(<span class="number">0</span>, <span class="number">8</span>), <span class="keyword">new</span> L.Point(<span class="number">10</span>, <span class="number">24</span>));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">let</span> textFunction = <span class="function"><span class="keyword">function</span>(<span class="params">value</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> &#123;</span><br><span class="line">            text: value,</span><br><span class="line">            style: &#123;</span><br><span class="line">                <span class="string">'font-size'</span>: fontSizeFunction.evaluate(value)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Setup a new data layer</span></span><br><span class="line">    <span class="keyword">let</span> dataLayer = <span class="keyword">new</span> L.DataLayer(data, &#123;</span><br><span class="line">        recordsField: <span class="string">'features'</span>,</span><br><span class="line">        latitudeField: <span class="string">'geometry.coordinates.1'</span>,</span><br><span class="line">        longitudeField: <span class="string">'geometry.coordinates.0'</span>,</span><br><span class="line">        locationMode: L.LocationModes.LATLNG,</span><br><span class="line">        displayOptions: &#123;</span><br><span class="line">            <span class="string">'properties.mag'</span>: &#123;</span><br><span class="line">                displayName: <span class="string">'震级'</span>,</span><br><span class="line">                color: magnitudeColorFunction,</span><br><span class="line">                fillColor: magnitudeFillColorFunction,</span><br><span class="line">                radius: magnitudeRadiusFunction,</span><br><span class="line">                text: textFunction</span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="string">'properties.time'</span>: &#123;</span><br><span class="line">                displayName: <span class="string">'时间'</span>,</span><br><span class="line">                opacity: timeOpacityFunction,</span><br><span class="line">                fillOpacity: timeOpacityFunction,</span><br><span class="line">                displayText: <span class="function"><span class="keyword">function</span>(<span class="params">value</span>) </span>&#123;</span><br><span class="line">                    <span class="keyword">return</span> moment.unix(value / <span class="number">1000</span>).format(<span class="string">'MM/DD/YY HH:mm'</span>);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        layerOptions: &#123;</span><br><span class="line">            numberOfSides: <span class="number">4</span>,</span><br><span class="line">            radius: <span class="number">10</span>,</span><br><span class="line">            weight: <span class="number">1</span>,</span><br><span class="line">            color: <span class="string">'#000'</span>,</span><br><span class="line">            opacity: <span class="number">0.2</span>,</span><br><span class="line">            stroke: <span class="literal">true</span>,</span><br><span class="line">            fillOpacity: <span class="number">0.7</span>,</span><br><span class="line">            dropShadow: <span class="literal">true</span>,</span><br><span class="line">            gradient: <span class="literal">true</span></span><br><span class="line">        &#125;,</span><br><span class="line">        tooltipOptions: &#123;</span><br><span class="line">            iconSize: <span class="keyword">new</span> L.Point(<span class="number">90</span>, <span class="number">90</span>), <span class="comment">//hover框大小</span></span><br><span class="line">            iconAnchor: <span class="keyword">new</span> L.Point(<span class="number">-4</span>, <span class="number">76</span>)</span><br><span class="line">        &#125;,</span><br><span class="line">        onEachRecord: <span class="function"><span class="keyword">function</span>(<span class="params">layer, record, location</span>) </span>&#123;</span><br><span class="line">            <span class="keyword">let</span> $html = $(L.HTMLUtils.buildTable(record));</span><br><span class="line"></span><br><span class="line">            layer.bindPopup($html.wrap(<span class="string">'&lt;div/&gt;'</span>).parent().html(), &#123;</span><br><span class="line">                minWidth: <span class="number">400</span>,</span><br><span class="line">                maxWidth: <span class="number">400</span></span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Add the data layer to the map</span></span><br><span class="line">    map.addLayer(dataLayer);</span><br><span class="line"></span><br><span class="line">    lastLayer = dataLayer;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">this</span>.mapSetting();</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (lastLayer) &#123;</span><br><span class="line">    map.removeLayer(lastLayer);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">"earthquakesData:"</span>, earthquakesData);</span><br><span class="line">eqfeed_callback(earthquakesData)</span><br></pre></td></tr></table></figure></p>
+<p><strong>收入水平图代码：</strong><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> incomeLevelTypes = [<span class="string">'OEC'</span>, <span class="string">'NOC'</span>, <span class="string">'UMC'</span>, <span class="string">'MIC'</span>, <span class="string">'LMC'</span>, <span class="string">'LIC'</span>, <span class="string">'HPC'</span>];</span><br><span class="line"><span class="keyword">let</span> valueArray = [&#123; <span class="string">"id"</span>: <span class="string">"HIC"</span>, <span class="string">"value"</span>: <span class="string">"高收入(HIC)"</span> &#125;,</span><br><span class="line">    &#123; <span class="string">"id"</span>: <span class="string">"HPC"</span>, <span class="string">"value"</span>: <span class="string">"收入严重不足(HIPC)"</span> &#125;, &#123; <span class="string">"id"</span>: <span class="string">"INX"</span>, <span class="string">"value"</span>: <span class="string">"未分类(INX)"</span> &#125;,</span><br><span class="line">    &#123; <span class="string">"id"</span>: <span class="string">"LIC"</span>, <span class="string">"value"</span>: <span class="string">"低收入(LIC)"</span> &#125;, &#123; <span class="string">"id"</span>: <span class="string">"LMC"</span>, <span class="string">"value"</span>: <span class="string">"中等偏下(LMC)"</span> &#125;,</span><br><span class="line">    &#123; <span class="string">"id"</span>: <span class="string">"LMY"</span>, <span class="string">"value"</span>: <span class="string">"中低等收入"</span> &#125;, &#123; <span class="string">"id"</span>: <span class="string">"MIC"</span>, <span class="string">"value"</span>: <span class="string">"中等收入(MIC)"</span> &#125;,</span><br><span class="line">    &#123; <span class="string">"id"</span>: <span class="string">"NOC"</span>, <span class="string">"value"</span>: <span class="string">"高收入：nonOECD(NOC)"</span> &#125;, &#123; <span class="string">"id"</span>: <span class="string">"OEC"</span>, <span class="string">"value"</span>: <span class="string">"高收入: OECD(OEC)"</span> &#125;,</span><br><span class="line">    &#123; <span class="string">"id"</span>: <span class="string">"UMC"</span>, <span class="string">"value"</span>: <span class="string">"中等偏上(UMC)"</span> &#125;</span><br><span class="line">];</span><br><span class="line"><span class="keyword">let</span> getMap = <span class="function"><span class="keyword">function</span>(<span class="params">valueArray</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> map = &#123;&#125;;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> index = <span class="number">0</span>; index &lt; valueArray.length; ++index) &#123;</span><br><span class="line">        <span class="keyword">let</span> value = valueArray[index];</span><br><span class="line"></span><br><span class="line">        map[value[<span class="string">'id'</span>]] = value[<span class="string">'value'</span>];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> map;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> valueMap = getMap(valueArray);</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> incomeLevelToText = <span class="function"><span class="keyword">function</span>(<span class="params">value</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> valueMap[incomeLevelTypes[value]];</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> colorFunction1 = <span class="keyword">new</span> L.HSLLuminosityFunction(<span class="keyword">new</span> L.Point(<span class="number">0</span>, <span class="number">0.2</span>), <span class="keyword">new</span> L.Point(incomeLevelTypes.length - <span class="number">1</span>, <span class="number">0.75</span>), &#123; <span class="attr">outputHue</span>: <span class="number">0</span>, <span class="attr">outputLuminosity</span>: <span class="string">'100%'</span> &#125;);</span><br><span class="line"><span class="keyword">let</span> fillColorFunction1 = <span class="keyword">new</span> L.HSLLuminosityFunction(<span class="keyword">new</span> L.Point(<span class="number">0</span>, <span class="number">0.5</span>), <span class="keyword">new</span> L.Point(incomeLevelTypes.length - <span class="number">1</span>, <span class="number">1</span>), &#123; <span class="attr">outputHue</span>: <span class="number">0</span>, <span class="attr">outputLuminosity</span>: <span class="string">'100%'</span> &#125;);</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> styles = <span class="keyword">new</span> L.StylesBuilder(incomeLevelTypes, &#123;</span><br><span class="line">    displayName: incomeLevelToText,</span><br><span class="line">    color: colorFunction1,</span><br><span class="line">    fillColor: fillColorFunction1</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> options = &#123;</span><br><span class="line">    recordsField: <span class="string">'1'</span>,</span><br><span class="line">    locationMode: L.LocationModes.COUNTRY,</span><br><span class="line">    codeField: <span class="string">'id'</span>,</span><br><span class="line">    displayOptions: &#123;</span><br><span class="line">        <span class="string">'incomeLevel.id'</span>: &#123;</span><br><span class="line">            displayName: <span class="string">'收入水平'</span>,</span><br><span class="line">            styles: styles.getStyles()</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    layerOptions: &#123;</span><br><span class="line">        fillOpacity: <span class="number">0.7</span>,</span><br><span class="line">        opacity: <span class="number">1</span>,</span><br><span class="line">        weight: <span class="number">1</span></span><br><span class="line">    &#125;,</span><br><span class="line">    tooltipOptions: &#123;</span><br><span class="line">        iconSize: <span class="keyword">new</span> L.Point(<span class="number">100</span>, <span class="number">65</span>),</span><br><span class="line">        iconAnchor: <span class="keyword">new</span> L.Point(<span class="number">-5</span>, <span class="number">65</span>)</span><br><span class="line">    &#125;,</span><br><span class="line"></span><br><span class="line">    onEachRecord: <span class="function"><span class="keyword">function</span>(<span class="params">layer, record</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">let</span> $html = $(L.HTMLUtils.buildTable(record));</span><br><span class="line"></span><br><span class="line">        layer.bindPopup($html.wrap(<span class="string">'&lt;div/&gt;'</span>).parent().html(), &#123;</span><br><span class="line">            maxWidth: <span class="number">400</span>,</span><br><span class="line">            minWidth: <span class="number">400</span></span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> incomeLayer = <span class="keyword">new</span> L.ChoroplethDataLayer(incomeLevels, options);</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> legendControl = <span class="keyword">new</span> L.Control.Legend();</span><br><span class="line"></span><br><span class="line">legendControl.addTo(map);</span><br><span class="line">map.addLayer(incomeLayer);</span><br></pre></td></tr></table></figure></p>
+<h1 id="5-GeoJSON"><a href="#5-GeoJSON" class="headerlink" title="5.GeoJSON"></a>5.GeoJSON</h1><p>假设我们需要自己做个地图，然后加载到平台中。这个时候可以使用我们提供了编辑栏，编辑后会得到坐标，把坐标转成GeoJSON数据存到数据库中，下次加载的时候解析即可。<br>还可以使用GIS工具，做成GeoJSON的数据，然后使用下面的方法加载，详细说明的<a href="https://zrysmt.github.io/2017/05/04/%E4%BD%BF%E7%94%A8leaflet%E6%88%96%E8%80%85openlayers-3-%E8%B0%83%E7%94%A8MapServer%E6%9C%8D%E5%8A%A1%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5%E5%AE%8C%E6%95%B4%E8%AF%B4%E6%98%8E/">传送门</a>在这，当然这包括MapServer的东西，我们将在第六部分有简要说明。<br><strong>示例图：</strong><br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/leaflet/1-12.jpg" alt=""><br>引入数据：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; json_china &#125; <span class="keyword">from</span> <span class="string">'../data/china.js'</span>;</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">pop_0</span>(<span class="params">feature, layer</span>) </span>&#123;<span class="comment">//部分有省略</span></span><br><span class="line">    <span class="keyword">let</span> popupContent = <span class="string">'&lt;table&gt;\</span></span><br><span class="line"><span class="string">                    &lt;tr&gt;\</span></span><br><span class="line"><span class="string">                        &lt;td colspan="2"&gt;面积：'</span> + (feature.properties[<span class="string">'AREA'</span>] !== <span class="literal">null</span> ? Autolinker.link(<span class="built_in">String</span>(feature.properties[<span class="string">'AREA'</span>])) : <span class="string">''</span>) + <span class="string">'&lt;/td&gt;\</span></span><br><span class="line"><span class="string">                    &lt;/tr&gt;\</span></span><br><span class="line"><span class="string">                    &lt;tr&gt;\</span></span><br><span class="line"><span class="string">                        &lt;td colspan="2"&gt;周长：'</span> + (feature.properties[<span class="string">'PERIMETER'</span>] !== <span class="literal">null</span> ? Autolinker.link(<span class="built_in">String</span>(feature.properties[<span class="string">'PERIMETER'</span>])) : <span class="string">''</span>) + <span class="string">'&lt;/td&gt;\</span></span><br><span class="line"><span class="string">                    &lt;/tr&gt;\</span></span><br><span class="line"><span class="string">                    &lt;tr&gt;\</span></span><br><span class="line"><span class="string">                        &lt;td colspan="2"&gt;名称：'</span> + (feature.properties[<span class="string">'NAME'</span>] !== <span class="literal">null</span> ? Autolinker.link(<span class="built_in">String</span>(feature.properties[<span class="string">'NAME'</span>])) : <span class="string">''</span>) + <span class="string">'&lt;/td&gt;\</span></span><br><span class="line"><span class="string">                    &lt;/tr&gt;\</span></span><br><span class="line"><span class="string">                &lt;/table&gt;'</span>;</span><br><span class="line">    layer.bindPopup(popupContent);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">style_0</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">        pane: <span class="string">'pane_0'</span>,</span><br><span class="line">        opacity: <span class="number">1</span>,</span><br><span class="line">        color: <span class="string">'rgba(0,0,0,0.494117647059)'</span>,</span><br><span class="line">        dashArray: <span class="string">''</span>,</span><br><span class="line">        lineCap: <span class="string">'butt'</span>,</span><br><span class="line">        lineJoin: <span class="string">'miter'</span>,</span><br><span class="line">        weight: <span class="number">1.0</span>,</span><br><span class="line">        fillOpacity: <span class="number">1</span>,</span><br><span class="line">        fillColor: <span class="string">'rgba(64,98,210,0.494117647059)'</span>,</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">map.createPane(<span class="string">'pane_0'</span>);</span><br><span class="line">map.getPane(<span class="string">'pane_0'</span>).style.zIndex = <span class="number">400</span>;</span><br><span class="line">map.getPane(<span class="string">'pane_0'</span>).style[<span class="string">'mix-blend-mode'</span>] = <span class="string">'normal'</span>;</span><br><span class="line"><span class="keyword">let</span> layer_0 = <span class="keyword">new</span> L.geoJson(json_china, &#123;</span><br><span class="line">    attribution: <span class="string">'&lt;a href=""&gt;&lt;/a&gt;'</span>,</span><br><span class="line">    pane: <span class="string">'pane_0'</span>,</span><br><span class="line">    onEachFeature: pop_0,</span><br><span class="line">    style: style_0</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h1 id="6-MapServer"><a href="#6-MapServer" class="headerlink" title="6.MapServer"></a>6.MapServer</h1><p>再进一步，如果我们想要自己的地图服务器，这个时候就需要使用到了MapServer,具体的说明见<a href="https://zrysmt.github.io/2017/05/04/%E4%BD%BF%E7%94%A8leaflet%E6%88%96%E8%80%85openlayers-3-%E8%B0%83%E7%94%A8MapServer%E6%9C%8D%E5%8A%A1%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5%E5%AE%8C%E6%95%B4%E8%AF%B4%E6%98%8E/">传送门</a></p>
+<p>有个示例在<code>test</code>文件夹下:<code>leaflet-mapserver.html</code>。注意这个是需要配置好服务器的，在这里直接预览是不能成功的。<br>示例得到我们的世界地图的地图服务器。<br><img src="https://raw.githubusercontent.com/zrysmt/mdPics/master/leaflet/1-13.jpg" alt=""></p>
+<p>其实leaflet和D3等开源库结合起来，能得到很多丰富多彩的可视化图，姑且留下点神秘，这里就不再探究两者结合的神奇魅力了。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/FE/" rel="tag"># FE</a>
+          
+            <a href="/tags/WebGIS/" rel="tag"># WebGIS</a>
+          
+            <a href="/tags/leaflet/" rel="tag"># leaflet</a>
+          
+            <a href="/tags/Echarts/" rel="tag"># Echarts</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/22/2017阿里实习校招-前端技术视频面试体会/" rel="next" title="2017阿里实习校招-前端技术视频面试体会">
+                <i class="fa fa-chevron-left"></i> 2017阿里实习校招-前端技术视频面试体会
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/06/02/基于WebGL的大数据二三维可视化-uber的deck-gl介绍/" rel="prev" title="基于WebGL的大数据二三维可视化--uber的deck.gl介绍">
+                基于WebGL的大数据二三维可视化--uber的deck.gl介绍 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ruyi Zhao</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">70</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">52</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-安装与编译"><span class="nav-number">1.</span> <span class="nav-text">1. 安装与编译</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-示例简介"><span class="nav-number">2.</span> <span class="nav-text">2.示例简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-基础的GIS功能"><span class="nav-number">3.</span> <span class="nav-text">3.基础的GIS功能</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-可视化示例"><span class="nav-number">4.</span> <span class="nav-text">4.可视化示例</span></a></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#5-GeoJSON"><span class="nav-number"></span> <span class="nav-text">5.GeoJSON</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-MapServer"><span class="nav-number"></span> <span class="nav-text">6.MapServer</span></a></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ruyi Zhao</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

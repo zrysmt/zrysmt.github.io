@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="代码挂在我的github上，对应文件夹v0.7.1。https://github.com/zrysmt/DIY-zepto  注：要在github源代码中自己编译的话，要在基础包命令：npm run dist上要进行扩展了，输入命令： 1234MODULES=&quot;zepto event fx fx_methods&quot; npm run dist# on Windows&amp;gt; SET MODULES=">
+<meta name="keywords" content="FE,源码,js原生实现库,zepto">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一步一步DIY zepto库，研究zepto源码7--动画模块(fx fx_method)">
+<meta property="og:url" content="https://zrysmt.github.io/2016/12/05/一步一步DIY zepto库，研究zepto源码7--动画模块(fx，fx_method)/index.html">
+<meta property="og:site_name" content="漫漫技术路">
+<meta property="og:description" content="代码挂在我的github上，对应文件夹v0.7.1。https://github.com/zrysmt/DIY-zepto  注：要在github源代码中自己编译的话，要在基础包命令：npm run dist上要进行扩展了，输入命令： 1234MODULES=&quot;zepto event fx fx_methods&quot; npm run dist# on Windows&amp;gt; SET MODULES=">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-11-30T03:06:50.850Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="一步一步DIY zepto库，研究zepto源码7--动画模块(fx fx_method)">
+<meta name="twitter:description" content="代码挂在我的github上，对应文件夹v0.7.1。https://github.com/zrysmt/DIY-zepto  注：要在github源代码中自己编译的话，要在基础包命令：npm run dist上要进行扩展了，输入命令： 1234MODULES=&quot;zepto event fx fx_methods&quot; npm run dist# on Windows&amp;gt; SET MODULES=">
+
+
+
+
+
+
+  <link rel="canonical" href="https://zrysmt.github.io/2016/12/05/一步一步DIY zepto库，研究zepto源码7--动画模块(fx，fx_method)/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>一步一步DIY zepto库，研究zepto源码7--动画模块(fx fx_method) | 漫漫技术路</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">漫漫技术路</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zrysmt.github.io/2016/12/05/一步一步DIY zepto库，研究zepto源码7--动画模块(fx，fx_method)/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ruyi Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="漫漫技术路">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">一步一步DIY zepto库，研究zepto源码7--动画模块(fx fx_method)
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2016-12-05 00:00:00" itemprop="dateCreated datePublished" datetime="2016-12-05T00:00:00+08:00">2016-12-05</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-11-30 11:06:50" itemprop="dateModified" datetime="2018-11-30T11:06:50+08:00">2018-11-30</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/前端技术/" itemprop="url" rel="index"><span itemprop="name">前端技术</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>代码挂在我的<a href="https://github.com/zrysmt/DIY-zepto" target="_blank" rel="noopener">github</a>上，对应文件夹v0.7.1。<br><a href="https://github.com/zrysmt/DIY-zepto" target="_blank" rel="noopener">https://github.com/zrysmt/DIY-zepto</a></p>
+</blockquote>
+<p>注：要在<a href="https://github.com/madrobby/zepto" target="_blank" rel="noopener">github源代码中</a>自己编译的话，要在基础包<code>命令：npm run dist</code>上要进行扩展了，输入命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">MODULES=<span class="string">"zepto event fx fx_methods"</span> npm run dist</span><br><span class="line"><span class="comment"># on Windows</span></span><br><span class="line">&gt; SET MODULES=zepto event fx fx_methods</span><br><span class="line">&gt; npm run dist</span><br></pre></td></tr></table></figure>
+<h1 id="1-示例Demo"><a href="#1-示例Demo" class="headerlink" title="1.示例Demo"></a>1.示例Demo</h1><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> div1 = $(<span class="string">'#foo1'</span>);</span><br><span class="line">div1.animate(&#123;</span><br><span class="line">        <span class="string">"width"</span>: <span class="string">"300px"</span>,</span><br><span class="line">        <span class="string">"height"</span>: <span class="string">"300px"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">'slow'</span>, <span class="string">'ease-in-out'</span>,</span><br><span class="line">    <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'div1 animate callback'</span>);</span><br><span class="line">        <span class="comment">// div2.hide('slow',function()&#123;</span></span><br><span class="line">        div2.fadeOut(<span class="string">'slow'</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">            <span class="built_in">console</span>.log(<span class="string">'div2 animate callback'</span>);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;, <span class="string">'2000'</span>);</span><br></pre></td></tr></table></figure>
+<h1 id="2-fx"><a href="#2-fx" class="headerlink" title="2.fx"></a>2.fx</h1><p>zepto的动画采用的是CSS3的动画/过渡，未做兼容。<br>核心方法是<code>$.fn.animate = function(properties, duration, ease, callback, delay)</code>，实际上的处理逻辑是<code>$.fn.anim = function(properties, duration, ease, callback, delay)</code><br>其本质就是设置好css3属性对象，然后用<code>this.css(cssValues)</code>方法是css3动画起作用。浏览器不支持的动画使用setTimeout<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// duration为0，即浏览器不支持动画的情况，直接执行动画结束，执行回调。</span></span><br><span class="line"><span class="keyword">if</span> (duration &lt;= <span class="number">0</span>) setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">   that.each(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123; wrappedCallback.call(<span class="keyword">this</span>); &#125;);</span><br><span class="line">&#125;, <span class="number">0</span>);</span><br></pre></td></tr></table></figure></p>
+<p>整体的源代码和注释放在下面<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> Fx = <span class="function"><span class="keyword">function</span>(<span class="params">$</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> prefix = <span class="string">''</span>,</span><br><span class="line">        eventPrefix,</span><br><span class="line">        vendors = &#123; <span class="attr">Webkit</span>: <span class="string">'webkit'</span>, <span class="attr">Moz</span>: <span class="string">''</span>, <span class="attr">O</span>: <span class="string">'o'</span> &#125;,</span><br><span class="line">        testEl = <span class="built_in">document</span>.createElement(<span class="string">'div'</span>),</span><br><span class="line">        supportedTransforms = <span class="regexp">/^((translate|rotate|scale)(X|Y|Z|3d)?|matrix(3d)?|perspective|skew(X|Y)?)$/i</span>,</span><br><span class="line">        transform,</span><br><span class="line">        transitionProperty, transitionDuration, transitionTiming, transitionDelay, <span class="comment">//过渡</span></span><br><span class="line">        animationName, animationDuration, animationTiming, animationDelay, <span class="comment">//动画</span></span><br><span class="line">        cssReset = &#123;&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//将驼峰字符串转成css属性，如aB--&gt;a-b</span></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">dasherize</span>(<span class="params">str</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> str.replace(<span class="regexp">/([a-z])([A-Z])/</span>, <span class="string">'$1-$2'</span>).toLowerCase();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//修正事件名</span></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">normalizeEvent</span>(<span class="params">name</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> eventPrefix ? eventPrefix + name : name.toLowerCase();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 根据浏览器内核，设置CSS前缀，事件前缀</span></span><br><span class="line"><span class="comment">     * 如css：-webkit-  event:webkit</span></span><br><span class="line"><span class="comment">     * 为prefix和eventPrefix赋值</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">if</span> (testEl.style.transform === <span class="literal">undefined</span>) &#123;</span><br><span class="line">        $.each(vendors, <span class="function"><span class="keyword">function</span>(<span class="params">vendor, event</span>) </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (testEl.style[vendor + <span class="string">'TransitionProperty'</span>] !== <span class="literal">undefined</span>) &#123;</span><br><span class="line">                prefix = <span class="string">'-'</span> + vendor.toLowerCase() + <span class="string">'-'</span>;</span><br><span class="line">                eventPrefix = event;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    transform = prefix + <span class="string">'transform'</span>;</span><br><span class="line">    <span class="comment">//均为空''</span></span><br><span class="line">    cssReset[transitionProperty = prefix + <span class="string">'transition-property'</span>] =</span><br><span class="line">        cssReset[transitionDuration = prefix + <span class="string">'transition-duration'</span>] =</span><br><span class="line">        cssReset[transitionDelay = prefix + <span class="string">'transition-delay'</span>] =</span><br><span class="line">        cssReset[transitionTiming = prefix + <span class="string">'transition-timing-function'</span>] =</span><br><span class="line">        cssReset[animationName = prefix + <span class="string">'animation-name'</span>] =</span><br><span class="line">        cssReset[animationDuration = prefix + <span class="string">'animation-duration'</span>] =</span><br><span class="line">        cssReset[animationDelay = prefix + <span class="string">'animation-delay'</span>] =</span><br><span class="line">        cssReset[animationTiming = prefix + <span class="string">'animation-timing-function'</span>] = <span class="string">''</span>;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 动画常量数据源</span></span><br><span class="line"><span class="comment">     * @type &#123;&#123;off: boolean, speeds: &#123;_default: number, fast: number, slow: number&#125;, cssPrefix: string, transitionEnd: *, animationEnd: *&#125;&#125;</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    $.fx = &#123;</span><br><span class="line">        off: (eventPrefix === <span class="literal">undefined</span> &amp;&amp; testEl.style.transitionProperty === <span class="literal">undefined</span>), <span class="comment">//能力检测是否支持动画，具体检测是否支持过渡，支持过渡事件</span></span><br><span class="line">        speeds: &#123; <span class="attr">_default</span>: <span class="number">400</span>, <span class="attr">fast</span>: <span class="number">200</span>, <span class="attr">slow</span>: <span class="number">600</span> &#125;,</span><br><span class="line">        cssPrefix: prefix, <span class="comment">//css 前缀  如-webkit-</span></span><br><span class="line">        transitionEnd: normalizeEvent(<span class="string">'TransitionEnd'</span>), <span class="comment">//过渡结束事件</span></span><br><span class="line">        animationEnd: normalizeEvent(<span class="string">'AnimationEnd'</span>) <span class="comment">//动画播放结束事件</span></span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * [animate 自定义动画]</span></span><br><span class="line"><span class="comment">     * @param  &#123;[Object]&#125;   properties [属性变化成，如&#123;"width":"300px"&#125;]</span></span><br><span class="line"><span class="comment">     * @param  &#123;[type]&#125;   duration   [速度 如slow或者一个数字]</span></span><br><span class="line"><span class="comment">     * @param  &#123;[type]&#125;   ease       [变化的速率ease、linear、ease-in / ease-out、ease-in-out</span></span><br><span class="line"><span class="comment">cubic-bezier]</span></span><br><span class="line"><span class="comment">     * @param  &#123;Function&#125; callback   [回调函数]</span></span><br><span class="line"><span class="comment">     * @param  &#123;[type]&#125;   delay      [延迟时间]</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    $.fn.animate = <span class="function"><span class="keyword">function</span>(<span class="params">properties, duration, ease, callback, delay</span>) </span>&#123;</span><br><span class="line">        <span class="comment">//参数处理</span></span><br><span class="line">        <span class="keyword">if</span> ($.isFunction(duration)) <span class="comment">//传参为function(properties,callback)</span></span><br><span class="line">            callback = duration, ease = <span class="literal">undefined</span>, duration = <span class="literal">undefined</span>;</span><br><span class="line">        <span class="keyword">if</span> ($.isFunction(ease)) <span class="comment">//传参为function(properties,duration，callback)</span></span><br><span class="line">            callback = ease, ease = <span class="literal">undefined</span>;</span><br><span class="line">        <span class="keyword">if</span> ($.isPlainObject(duration)) <span class="comment">//传参为function(properties,｛｝)</span></span><br><span class="line">            ease = duration.easing, callback = duration.complete, delay = duration.delay, duration = duration.duration</span><br><span class="line">            <span class="comment">//duration参数处理</span></span><br><span class="line">        <span class="keyword">if</span> (duration) duration = (<span class="keyword">typeof</span> duration == <span class="string">'number'</span> ? duration :</span><br><span class="line">            ($.fx.speeds[duration] || $.fx.speeds._default)) / <span class="number">1000</span>;</span><br><span class="line">        <span class="keyword">if</span> (delay) delay = <span class="built_in">parseFloat</span>(delay) / <span class="number">1000</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.anim(properties, duration, ease, callback, delay);</span><br><span class="line">    &#125;;</span><br><span class="line">    $.fn.anim = <span class="function"><span class="keyword">function</span>(<span class="params">properties, duration, ease, callback, delay</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> key, cssValues = &#123;&#125;,</span><br><span class="line">            cssProperties, transforms = <span class="string">''</span>,</span><br><span class="line">            that = <span class="keyword">this</span>,</span><br><span class="line">            wrappedCallback, endEvent = $.fx.transitionEnd,</span><br><span class="line">            fired = <span class="literal">false</span>;</span><br><span class="line">        <span class="comment">//修正好时间</span></span><br><span class="line">        <span class="keyword">if</span> (duration === <span class="literal">undefined</span>) duration = $.fx.speeds._default / <span class="number">1000</span>;</span><br><span class="line">        <span class="keyword">if</span> (delay === <span class="literal">undefined</span>) delay = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">if</span> ($.fx.off) duration = <span class="number">0</span>; <span class="comment">//如果浏览器不支持动画，持续时间设为0，直接跳动画结束</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">typeof</span> properties == <span class="string">'string'</span>) &#123;</span><br><span class="line">            <span class="comment">// keyframe animation</span></span><br><span class="line">            cssValues[animationName] = properties; <span class="comment">//properties是动画名</span></span><br><span class="line">            cssValues[animationDuration] = duration + <span class="string">'s'</span>;</span><br><span class="line">            cssValues[animationDelay] = delay + <span class="string">'s'</span>;</span><br><span class="line">            cssValues[animationTiming] = (ease || <span class="string">'linear'</span>);</span><br><span class="line">            endEvent = $.fx.animationEnd;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123; <span class="comment">//properties 是样式集对象</span></span><br><span class="line">            cssProperties = [];</span><br><span class="line">            <span class="comment">// CSS transitions</span></span><br><span class="line">            <span class="keyword">for</span> (key <span class="keyword">in</span> properties) &#123;</span><br><span class="line">                <span class="comment">//是这些属性^((translate|rotate|scale)(X|Y|Z|3d)?|matrix(3d)?|perspective|skew(X|Y)?)</span></span><br><span class="line">                <span class="keyword">if</span> (supportedTransforms.test(key)) &#123;</span><br><span class="line">                    transforms += key + <span class="string">'('</span> + properties[key] + <span class="string">') '</span>; <span class="comment">//拼凑成变形方法</span></span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    cssValues[key] = properties[key], cssProperties.push(dasherize(key));</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (transforms) cssValues[transform] = transforms, cssProperties.push(transform);</span><br><span class="line">            <span class="keyword">if</span> (duration &gt; <span class="number">0</span> &amp;&amp; <span class="keyword">typeof</span> properties === <span class="string">'object'</span>) &#123;</span><br><span class="line">                cssValues[transitionProperty] = cssProperties.join(<span class="string">', '</span>);</span><br><span class="line">                cssValues[transitionDuration] = duration + <span class="string">'s'</span>;</span><br><span class="line">                cssValues[transitionDelay] = delay + <span class="string">'s'</span>;</span><br><span class="line">                cssValues[transitionTiming] = (ease || <span class="string">'linear'</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//动画完成后的响应函数</span></span><br><span class="line">        wrappedCallback = <span class="function"><span class="keyword">function</span>(<span class="params">event</span>) </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">typeof</span> event !== <span class="string">'undefined'</span>) &#123;</span><br><span class="line">                <span class="keyword">if</span> (event.target !== event.currentTarget) <span class="keyword">return</span>; <span class="comment">// makes sure the event didn't bubble from "below"</span></span><br><span class="line">                $(event.target).unbind(endEvent, wrappedCallback);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                $(<span class="keyword">this</span>).unbind(endEvent, wrappedCallback); <span class="comment">// triggered by setTimeout</span></span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            fired = <span class="literal">true</span>;</span><br><span class="line">            $(<span class="keyword">this</span>).css(cssReset);</span><br><span class="line"></span><br><span class="line">            callback &amp;&amp; callback.call(<span class="keyword">this</span>);</span><br><span class="line">        &#125;;</span><br><span class="line">        <span class="comment">//处理动画结束事件</span></span><br><span class="line">        <span class="keyword">if</span> (duration &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="comment">//绑定动画结束事件</span></span><br><span class="line">            <span class="keyword">this</span>.bind(endEvent, wrappedCallback);</span><br><span class="line">            <span class="comment">// transitionEnd is not always firing on older Android phones</span></span><br><span class="line">            <span class="comment">// so make sure it gets fired</span></span><br><span class="line">            <span class="comment">//延时ms后执行动画，注意这里加了25ms，保持endEvent，动画先执行完。</span></span><br><span class="line">            <span class="comment">//绑定过事件还做延时处理，是transitionEnd在older Android phones不一定触发    </span></span><br><span class="line">            setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">                <span class="keyword">if</span> (fired) <span class="keyword">return</span>;</span><br><span class="line">                wrappedCallback.call(that);</span><br><span class="line">            &#125;, ((duration + delay) * <span class="number">1000</span>) + <span class="number">25</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// trigger page reflow so new elements can animate</span></span><br><span class="line">        <span class="comment">//主动触发页面回流，刷新DOM，让接下来设置的动画可以正确播放</span></span><br><span class="line">        <span class="comment">//更改 offsetTop、offsetLeft、 offsetWidth、offsetHeight；scrollTop、scrollLeft、</span></span><br><span class="line">        <span class="comment">//scrollWidth、scrollHeight；clientTop、clientLeft、clientWidth、clientHeight；getComputedStyle() 、</span></span><br><span class="line">        <span class="comment">//currentStyle()。这些都会触发回流。回流导致DOM重新渲染，平时要尽可能避免，</span></span><br><span class="line">        <span class="comment">//但这里，为了动画即时生效播放，则主动触发回流，刷新DOM</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">this</span>.size() &amp;&amp; <span class="keyword">this</span>.get(<span class="number">0</span>).clientLeft;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//设置样式，启动动画</span></span><br><span class="line">        <span class="keyword">this</span>.css(cssValues);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// duration为0，即浏览器不支持动画的情况，直接执行动画结束，执行回调。</span></span><br><span class="line">        <span class="keyword">if</span> (duration &lt;= <span class="number">0</span>) setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">            that.each(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123; wrappedCallback.call(<span class="keyword">this</span>); &#125;);</span><br><span class="line">        &#125;, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    testEl = <span class="literal">null</span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> Fx;</span><br></pre></td></tr></table></figure></p>
+<h1 id="3-fx-methods"><a href="#3-fx-methods" class="headerlink" title="3.fx_methods"></a>3.fx_methods</h1><p>源码中的<code>fx_methods</code>（fx_methods.js中）方法，说白了就是利用上面的<code>fx.js</code>文件下的<code>$.fn.animate</code>函数提供便捷的方法</p>
+<p>整体源码和注释放在这里</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> Fx_methods = <span class="function"><span class="keyword">function</span>(<span class="params">$</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> <span class="built_in">document</span> = <span class="built_in">window</span>.document,</span><br><span class="line">        docElem = <span class="built_in">document</span>.documentElement,</span><br><span class="line">        origShow = $.fn.show,</span><br><span class="line">        origHide = $.fn.hide,</span><br><span class="line">        origToggle = $.fn.toggle;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">anim</span>(<span class="params">el, speed, opacity, scale, callback</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">typeof</span> speed == <span class="string">'function'</span> &amp;&amp; !callback) callback = speed, speed = <span class="literal">undefined</span>;</span><br><span class="line">        <span class="keyword">var</span> props = &#123; <span class="attr">opacity</span>: opacity &#125;;</span><br><span class="line">        <span class="keyword">if</span> (scale) &#123;</span><br><span class="line">            props.scale = scale;</span><br><span class="line">            el.css($.fx.cssPrefix + <span class="string">'transform-origin'</span>, <span class="string">'0 0'</span>); <span class="comment">//设置变形原点</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> el.animate(props, speed, <span class="literal">null</span>, callback); <span class="comment">//不支持速率变化</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">hide</span>(<span class="params">el, speed, scale, callback</span>) </span>&#123;</span><br><span class="line">        <span class="comment">//$(dom).animate(&#123;opacity: 0, '-webkit-transform-origin': '0px 0px 0px', '-webkit-transform': 'scale(0, 0)' &#125;,800)</span></span><br><span class="line">        <span class="comment">//设置了变形原点，缩放为0，它就会缩到左上角再透明</span></span><br><span class="line">        <span class="keyword">return</span> anim(el, speed, <span class="number">0</span>, scale, <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">            origHide.call($(<span class="keyword">this</span>));</span><br><span class="line">            callback &amp;&amp; callback.call(<span class="keyword">this</span>);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    $.fn.show = <span class="function"><span class="keyword">function</span>(<span class="params">speed, callback</span>) </span>&#123;</span><br><span class="line">        origShow.call(<span class="keyword">this</span>);</span><br><span class="line">        <span class="keyword">if</span> (speed === <span class="literal">undefined</span>) &#123;</span><br><span class="line">            speed = <span class="number">0</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">this</span>.css(<span class="string">'opacity'</span>, <span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> anim(<span class="keyword">this</span>, speed, <span class="number">1</span>, <span class="string">'1,1'</span>, callback);</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    $.fn.hide = <span class="function"><span class="keyword">function</span>(<span class="params">speed, callback</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (speed === <span class="literal">undefined</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> origHide.call(<span class="keyword">this</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> hide(<span class="keyword">this</span>, speed, <span class="string">'0,0'</span>, callback);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    $.fn.toggle = <span class="function"><span class="keyword">function</span>(<span class="params">speed, callback</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (speed === <span class="literal">undefined</span> || <span class="keyword">typeof</span> speed == <span class="string">'boolean'</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> origToggle.call(<span class="keyword">this</span>, speed);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>.each(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">                <span class="keyword">var</span> el = $(<span class="keyword">this</span>);</span><br><span class="line">                el[el.css(<span class="string">'display'</span>) == <span class="string">'none'</span> ? <span class="string">'show'</span> : <span class="string">'hide'</span>](speed, callback);</span><br><span class="line">            &#125;);</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    $.fn.fadeTo = <span class="function"><span class="keyword">function</span>(<span class="params">speed, opacity, callback</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> anim(<span class="keyword">this</span>, speed, opacity, <span class="literal">null</span>, callback);</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    $.fn.fadeIn = <span class="function"><span class="keyword">function</span>(<span class="params">speed, callback</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> target = <span class="keyword">this</span>.css(<span class="string">'opacity'</span>);</span><br><span class="line">        <span class="keyword">if</span> (target &gt; <span class="number">0</span>)&#123;</span><br><span class="line">         <span class="keyword">this</span>.css(<span class="string">'opacity'</span>, <span class="number">0</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            target = <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> origShow.call(<span class="keyword">this</span>).fadeTo(speed, target, callback);</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    $.fn.fadeOut = <span class="function"><span class="keyword">function</span>(<span class="params">speed, callback</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> hide(<span class="keyword">this</span>, speed, <span class="literal">null</span>, callback);</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    $.fn.fadeToggle = <span class="function"><span class="keyword">function</span>(<span class="params">speed, callback</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.each(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">            <span class="keyword">var</span> el = $(<span class="keyword">this</span>);</span><br><span class="line">            el[</span><br><span class="line">                (el.css(<span class="string">'opacity'</span>) == <span class="number">0</span> || el.css(<span class="string">'display'</span>) == <span class="string">'none'</span>) ? <span class="string">'fadeIn'</span> : <span class="string">'fadeOut'</span></span><br><span class="line">            ](speed, callback);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> Fx_methods;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>全部代码挂在我的<a href="https://github.com/zrysmt/DIY-zepto" target="_blank" rel="noopener">github</a>上，本博文对应文件夹v0.7.x。<br><a href="https://github.com/zrysmt/DIY-zepto" target="_blank" rel="noopener">https://github.com/zrysmt/DIY-zepto</a></p>
+</blockquote>
+<p>参考阅读：</p>
+<ul>
+<li><a href="http://www.cnblogs.com/mominger/p/4538685.html" target="_blank" rel="noopener">Zepto源码分析-动画(fx fx_method)模块</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/FE/" rel="tag"># FE</a>
+          
+            <a href="/tags/源码/" rel="tag"># 源码</a>
+          
+            <a href="/tags/js原生实现库/" rel="tag"># js原生实现库</a>
+          
+            <a href="/tags/zepto/" rel="tag"># zepto</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/05/一步一步DIY zepto库，研究zepto源码8--touch模块/" rel="next" title="一步一步DIY zepto库，研究zepto源码8--touch模块">
+                <i class="fa fa-chevron-left"></i> 一步一步DIY zepto库，研究zepto源码8--touch模块
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/05/一步一步DIY zepto库，研究zepto源码3 -- 事件模块/" rel="prev" title="一步一步DIY zepto库，研究zepto源码3 -- 事件模块">
+                一步一步DIY zepto库，研究zepto源码3 -- 事件模块 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ruyi Zhao</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">70</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">52</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-示例Demo"><span class="nav-number">1.</span> <span class="nav-text">1.示例Demo</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-fx"><span class="nav-number">2.</span> <span class="nav-text">2.fx</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-fx-methods"><span class="nav-number">3.</span> <span class="nav-text">3.fx_methods</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ruyi Zhao</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

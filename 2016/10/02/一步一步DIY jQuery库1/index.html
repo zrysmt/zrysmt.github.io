@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="前一段时间，看到一篇系列文章《从零开始，DIY一个jQuery 1-3》三篇文章从头讲解如何DIY一个jQuery，感觉挺有意思，今天想试一试看看。 我在前端已经有了一年的经验，jquery几乎是每天都会使用到，但是现在还没时间去研究一下它的源码，即使这样我也想动手尝试下DIY一个JQuery库，我相信这可以加深我对jquery的理解，当然我也试着去学习jquery的源码，这很可能会写成一个系列的">
+<meta name="keywords" content="FE,jQuery,js原生实现库">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一步一步DIY jQuery库1">
+<meta property="og:url" content="https://zrysmt.github.io/2016/10/02/一步一步DIY jQuery库1/index.html">
+<meta property="og:site_name" content="漫漫技术路">
+<meta property="og:description" content="前一段时间，看到一篇系列文章《从零开始，DIY一个jQuery 1-3》三篇文章从头讲解如何DIY一个jQuery，感觉挺有意思，今天想试一试看看。 我在前端已经有了一年的经验，jquery几乎是每天都会使用到，但是现在还没时间去研究一下它的源码，即使这样我也想动手尝试下DIY一个JQuery库，我相信这可以加深我对jquery的理解，当然我也试着去学习jquery的源码，这很可能会写成一个系列的">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-11-30T03:06:50.847Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="一步一步DIY jQuery库1">
+<meta name="twitter:description" content="前一段时间，看到一篇系列文章《从零开始，DIY一个jQuery 1-3》三篇文章从头讲解如何DIY一个jQuery，感觉挺有意思，今天想试一试看看。 我在前端已经有了一年的经验，jquery几乎是每天都会使用到，但是现在还没时间去研究一下它的源码，即使这样我也想动手尝试下DIY一个JQuery库，我相信这可以加深我对jquery的理解，当然我也试着去学习jquery的源码，这很可能会写成一个系列的">
+
+
+
+
+
+
+  <link rel="canonical" href="https://zrysmt.github.io/2016/10/02/一步一步DIY jQuery库1/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>一步一步DIY jQuery库1 | 漫漫技术路</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">漫漫技术路</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zrysmt.github.io/2016/10/02/一步一步DIY jQuery库1/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ruyi Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="漫漫技术路">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">一步一步DIY jQuery库1
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2016-10-02 00:00:00" itemprop="dateCreated datePublished" datetime="2016-10-02T00:00:00+08:00">2016-10-02</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-11-30 11:06:50" itemprop="dateModified" datetime="2018-11-30T11:06:50+08:00">2018-11-30</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/前端技术/" itemprop="url" rel="index"><span itemprop="name">前端技术</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>前一段时间，看到一篇系列文章《从零开始，DIY一个jQuery 1-3》三篇文章从头讲解如何DIY一个jQuery，感觉挺有意思，今天想试一试看看。</p>
+<p>我在前端已经有了一年的经验，jquery几乎是每天都会使用到，但是现在还没时间去研究一下它的源码，即使这样我也想动手尝试下DIY一个JQuery库，我相信这可以加深我对jquery的理解，当然我也试着去学习jquery的源码，这很可能会写成一个系列的文章，这个系列文章以一个入门的jquery原理探索者的视角。当然，这篇文章作为入门的入门。</p>
+<p>【注】所有代码挂在我的<a href="https://github.com/zrysmt/DIY-jQuery" target="_blank" rel="noopener">github</a>上</p>
+<h1 id="1-实现一个基本的框架"><a href="#1-实现一个基本的框架" class="headerlink" title="1.实现一个基本的框架"></a>1.实现一个基本的框架</h1><h2 id="1-1-整体"><a href="#1-1-整体" class="headerlink" title="1.1 整体"></a>1.1 整体</h2><ul>
+<li>整体是个闭包，独立作用域，避免污染全局变量</li>
+<li>不用new，是因为使用了工厂模式，new放在了内部<code>return new jQuery.fn.init(selector)</code></li>
+<li>jQuery是最基础的对象，方法放在了<code>jQuery.prototype</code>中，即是<code>jQuery.fn</code></li>
+<li>$.extend / $.fn.extend 来扩展静态方法和原型方法</li>
+<li>使用全局变量<code>window.$</code>, <code>window.jQuery</code>即可调用</li>
+<li><code>return this</code>为了链式调用</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//IIFE 独立作用域</span></span><br><span class="line">    (<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> version = <span class="string">'0.0.1'</span>;</span><br><span class="line"></span><br><span class="line">        jQuery = <span class="function"><span class="keyword">function</span>(<span class="params">selector</span>) </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> jQuery.fn.init(selector); <span class="comment">//jQuery实例的构造函数已经变成了 jQuery.fn.init </span></span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/*jQuery.fn   主要方法*/</span></span><br><span class="line">        jQuery.fn = jQuery.prototype = &#123;</span><br><span class="line">            jquery: version,</span><br><span class="line">            construct: jQuery,</span><br><span class="line">            <span class="comment">//方法</span></span><br><span class="line">            setBackground: <span class="function"><span class="keyword">function</span>(<span class="params">color</span>) </span>&#123;</span><br><span class="line">                <span class="keyword">this</span>[<span class="number">0</span>].style.background = color;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">this</span>;  <span class="comment">//链式调用</span></span><br><span class="line">            &#125;,</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> init = jQuery.fn.init = <span class="function"><span class="keyword">function</span>(<span class="params">selector</span>) </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (!selector) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">var</span> elem = <span class="built_in">document</span>.querySelector(selector);</span><br><span class="line">                <span class="keyword">if</span> (elem) &#123;</span><br><span class="line">                    <span class="keyword">this</span>[<span class="number">0</span>] = elem;</span><br><span class="line">                    <span class="keyword">this</span>.length = <span class="number">1</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="built_in">console</span>.info(<span class="keyword">this</span>);</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">        init.prototype = jQuery.prototype; <span class="comment">//把 jQuery.fn.init 的原型指向 jQuery 的原型（jQuery.prototype / jQuery.fn）即可</span></span><br><span class="line"></span><br><span class="line">        <span class="built_in">window</span>.$ = <span class="built_in">window</span>.jQuery = jQuery;</span><br><span class="line">    &#125;)();</span><br></pre></td></tr></table></figure>
+<p><strong>测试</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">var $div = $(&apos;div&apos;);</span><br><span class="line">console.log($div);</span><br><span class="line">$div.setBackground(&apos;blue&apos;);</span><br><span class="line">console.log($div.jquery); //0.0.1</span><br><span class="line">console.log($.fn.jquery); //0.0.1</span><br></pre></td></tr></table></figure></p>
+<p>$div的结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">- j…y.fn.init &#123;0: div, length: 1&#125;</span><br><span class="line">  + 0:div</span><br><span class="line">  + length:1</span><br></pre></td></tr></table></figure>
+<h2 id="1-2-冲突处理"><a href="#1-2-冲突处理" class="headerlink" title="1.2 冲突处理"></a>1.2 冲突处理</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*冲突处理*/</span></span><br><span class="line"><span class="keyword">var</span> _jQuery = <span class="built_in">window</span>.jQuery,</span><br><span class="line">_$ = <span class="built_in">window</span>.$;</span><br><span class="line"><span class="comment">//deep 参数类型为 Boolean，若为真，表示要求连window.jQuery 变量都需要吐回去</span></span><br><span class="line">jQuery.noConflict = <span class="function"><span class="keyword">function</span>(<span class="params">deep</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">window</span>.$ === jQuery) &#123;</span><br><span class="line">    <span class="built_in">window</span>.$ = _$;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//确保window.jQuery没有再次被改写</span></span><br><span class="line"><span class="keyword">if</span> (deep &amp;&amp; <span class="built_in">window</span>.jQuery === jQuery) &#123;</span><br><span class="line">    <span class="built_in">window</span>.jQuery = _jQuery;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> jQuery; <span class="comment">//返回 jQuery 接口引用</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p><strong>测试</strong><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">var $$$ = jQuery.noConflict();</span><br><span class="line">$$$(&apos;div&apos;).setBackground(&apos;red&apos;);</span><br></pre></td></tr></table></figure></p>
+<h2 id="1-3-extend-fn-extend-来扩展静态方法和原型方法"><a href="#1-3-extend-fn-extend-来扩展静态方法和原型方法" class="headerlink" title="1.3 $.extend / $.fn.extend 来扩展静态方法和原型方法"></a>1.3 <code>$.extend</code> / <code>$.fn.extend</code> 来扩展静态方法和原型方法</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">jQuery.extend = jQuery.fn.extend = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">     <span class="keyword">var</span> target = <span class="built_in">arguments</span>[<span class="number">0</span>] || &#123;&#125;;</span><br><span class="line">     <span class="keyword">for</span>(<span class="keyword">var</span> key <span class="keyword">in</span> target)&#123;</span><br><span class="line">         jQuery.fn[key] = target[key];</span><br><span class="line">     &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>但是调用必须是<code>$().min</code>而不能是<code>$.min</code><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">jQuery.extend(&#123;</span><br><span class="line">    min: function(a, b) &#123;</span><br><span class="line">        return a &lt; b ? a : b;</span><br><span class="line">    &#125;,</span><br><span class="line">    max: function(a, b) &#123;</span><br><span class="line">        return a &gt; b ? a : b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">console.log($().min(3,5));</span><br></pre></td></tr></table></figure></p>
+<p>当然这只是个人的一些想法，我们来仿照jquery源码实现</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> isObject = <span class="function"><span class="keyword">function</span>(<span class="params">obj</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">Object</span>.prototype.toString.call(obj) === <span class="string">"[object Object]"</span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">var</span> isArray = <span class="function"><span class="keyword">function</span>(<span class="params">obj</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">Object</span>.prototype.toString.call(obj) === <span class="string">"[object Array]"</span>;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">var</span> options, i = <span class="number">1</span>,</span><br><span class="line">length = <span class="built_in">arguments</span>.length,</span><br><span class="line">target = <span class="built_in">arguments</span>[<span class="number">0</span>] || &#123;&#125;,</span><br><span class="line">deep = <span class="literal">false</span>; <span class="comment">//默认为浅复制</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">typeof</span> target === <span class="string">"boolean"</span>) &#123;</span><br><span class="line">    deep = target;</span><br><span class="line">    taeget = <span class="built_in">arguments</span>[i] || &#123;&#125;;</span><br><span class="line">    i++;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">typeof</span> target !== <span class="string">"object"</span> &amp;&amp; <span class="keyword">typeof</span> target !== <span class="string">"function"</span>) &#123;</span><br><span class="line">    target = &#123;&#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//target后面没有其他参数了(要拷贝的对象)，直接扩展jQuery自身，target并入jQuery</span></span><br><span class="line"><span class="keyword">if</span> (i === length) &#123;</span><br><span class="line">    target = <span class="keyword">this</span>;</span><br><span class="line">    i--;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">for</span> (; i &lt; length; i++) &#123;</span><br><span class="line">    <span class="keyword">if</span> ((options = <span class="built_in">arguments</span>[i]) != <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> name, clone, copy;</span><br><span class="line">    <span class="keyword">for</span> (name <span class="keyword">in</span> options) &#123;</span><br><span class="line">        src = target[name]; <span class="comment">//jQuery是否已经有该属性</span></span><br><span class="line">        copy = options[name];</span><br><span class="line">        <span class="keyword">if</span> (target === copy) &#123;</span><br><span class="line">           <span class="keyword">continue</span>;</span><br><span class="line">         &#125;</span><br><span class="line">       <span class="comment">//1-深拷贝，且确保被拷属性为对象/数组</span></span><br><span class="line">       <span class="keyword">if</span> (deep &amp;&amp; copy &amp;&amp; (isObject(copy)||(copyIsArray = isArray(copy))))&#123;</span><br><span class="line">       <span class="comment">//被拷贝属性为数组</span></span><br><span class="line">          <span class="keyword">if</span>(copyIsArray)&#123;</span><br><span class="line">              copyIsArray = <span class="literal">false</span>;</span><br><span class="line">              <span class="comment">//被合并属性</span></span><br><span class="line">              clone = src &amp;&amp; isArray(src)?src:[];</span><br><span class="line">          &#125;<span class="keyword">else</span>&#123;<span class="comment">//被拷贝属性为对象</span></span><br><span class="line">              clone = src &amp;&amp; isArray(src)?src:&#123;&#125;;</span><br><span class="line">          &#125;</span><br><span class="line">           <span class="comment">//右侧递归，直到内部属性值是非对象</span></span><br><span class="line">         target[name] = jQuery.extend(deep,clone,copy);</span><br><span class="line">      &#125;<span class="keyword">else</span> <span class="keyword">if</span>(copy!==<span class="literal">undefined</span>)&#123;<span class="comment">//2-非对象/数组，或者浅复制的情况</span></span><br><span class="line">         target[name] = copy;<span class="comment">//递归结束</span></span><br><span class="line">       &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//返回修改后的target</span></span><br><span class="line"><span class="keyword">return</span> target;</span><br></pre></td></tr></table></figure>
+<p>拷贝主要分为两个部分：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//1-深拷贝，且确保被拷属性为对象/数组</span></span><br><span class="line"><span class="keyword">if</span> (deep &amp;&amp; copy &amp;&amp; isObject(copy)||(copyIsArray = isArray(copy)))&#123;</span><br><span class="line">    <span class="comment">/*...*/</span>&#125;</span><br><span class="line"><span class="comment">//2-非对象/数组，或者浅复制的情况</span></span><br><span class="line"><span class="keyword">else</span> <span class="keyword">if</span>(copy!==<span class="literal">undefined</span>)&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用的几种情况</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$.extend(  targetObj,  copyObj1[,  copyObj2...]  )</span><br><span class="line">$.extend(  <span class="literal">true</span>,  targetObj,  copyObj1[,  copyObj2...]  )</span><br><span class="line">$.extend(  copyObj  )</span><br><span class="line">$.extend(  <span class="literal">true</span>,  copyObj</span><br></pre></td></tr></table></figure>
+<p>测试</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"> jQuery.extend(&#123;</span><br><span class="line">     min: <span class="function"><span class="keyword">function</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">         <span class="keyword">return</span> a &lt; b ? a : b;</span><br><span class="line">     &#125;,</span><br><span class="line">     max: <span class="function"><span class="keyword">function</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">         <span class="keyword">return</span> a &gt; b ? a : b;</span><br><span class="line">     &#125;</span><br><span class="line">&#125;);</span><br><span class="line"><span class="built_in">console</span>.log($.min(<span class="number">3</span>, <span class="number">5</span>));</span><br></pre></td></tr></table></figure>
+<p>注意：这个时候只是使用<code>isObject</code>,<code>isArray</code>并不严谨<br>在某些浏览器中，像 document 在 Object.toSting 调用时也会返回和 Object 相同结果；<br>这些我们将在《一步一步DIY一个自己jQuery库2》中进行补充。</p>
+<h1 id="2-全部代码"><a href="#2-全部代码" class="headerlink" title="2.全部代码"></a>2.全部代码</h1><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//IIFE 独立作用域</span></span><br><span class="line">    (<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">var</span> version = <span class="string">'0.0.1'</span>;</span><br><span class="line"></span><br><span class="line">        jQuery = <span class="function"><span class="keyword">function</span>(<span class="params">selector</span>) </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> jQuery.fn.init(selector); <span class="comment">//jQuery实例的构造函数已经变成了 jQuery.fn.init </span></span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/*冲突处理*/</span></span><br><span class="line">        <span class="keyword">var</span> _jQuery = <span class="built_in">window</span>.jQuery,</span><br><span class="line">            _$ = <span class="built_in">window</span>.$;</span><br><span class="line">        <span class="comment">//deep 参数类型为 Boolean，若为真，表示要求连window.jQuery 变量都需要吐回去</span></span><br><span class="line">        jQuery.noConflict = <span class="function"><span class="keyword">function</span>(<span class="params">deep</span>) </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="built_in">window</span>.$ === jQuery) &#123;</span><br><span class="line">                <span class="built_in">window</span>.$ = _$;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">//确保window.jQuery没有再次被改写</span></span><br><span class="line">            <span class="keyword">if</span> (deep &amp;&amp; <span class="built_in">window</span>.jQuery === jQuery) &#123;</span><br><span class="line">                <span class="built_in">window</span>.jQuery = _jQuery;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> jQuery; <span class="comment">//返回 jQuery 接口引用</span></span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/*jQuery.fn   主要方法*/</span></span><br><span class="line">        jQuery.fn = jQuery.prototype = &#123;</span><br><span class="line">            jquery: version,</span><br><span class="line">            construct: jQuery,</span><br><span class="line">            <span class="comment">//方法</span></span><br><span class="line">            setBackground: <span class="function"><span class="keyword">function</span>(<span class="params">color</span>) </span>&#123;</span><br><span class="line">                <span class="keyword">this</span>[<span class="number">0</span>].style.background = color;</span><br><span class="line">                <span class="built_in">console</span>.warn(<span class="keyword">this</span>);</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">            &#125;,</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> init = jQuery.fn.init = <span class="function"><span class="keyword">function</span>(<span class="params">selector</span>) </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (!selector) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">var</span> elem = <span class="built_in">document</span>.querySelector(selector);</span><br><span class="line">                <span class="keyword">if</span> (elem) &#123;</span><br><span class="line">                    <span class="keyword">this</span>[<span class="number">0</span>] = elem;</span><br><span class="line">                    <span class="keyword">this</span>.length = <span class="number">1</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="built_in">console</span>.info(<span class="keyword">this</span>);</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">        init.prototype = jQuery.prototype; <span class="comment">//把 jQuery.fn.init 的原型指向 jQuery 的原型（jQuery.prototype / jQuery.fn）即可</span></span><br><span class="line"></span><br><span class="line">        jQuery.extend = jQuery.fn.extend = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">            <span class="keyword">var</span> isObject = <span class="function"><span class="keyword">function</span>(<span class="params">obj</span>) </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="built_in">Object</span>.prototype.toString.call(obj) === <span class="string">"[object Object]"</span>;</span><br><span class="line">            &#125;;</span><br><span class="line">            <span class="keyword">var</span> isArray = <span class="function"><span class="keyword">function</span>(<span class="params">obj</span>) </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="built_in">Object</span>.prototype.toString.call(obj) === <span class="string">"[object Array]"</span>;</span><br><span class="line">            &#125;;</span><br><span class="line">            <span class="keyword">var</span> options, i = <span class="number">1</span>,</span><br><span class="line">                length = <span class="built_in">arguments</span>.length,</span><br><span class="line">                target = <span class="built_in">arguments</span>[<span class="number">0</span>] || &#123;&#125;,</span><br><span class="line">                deep = <span class="literal">false</span>; <span class="comment">//默认为浅复制</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">typeof</span> target === <span class="string">"boolean"</span>) &#123;</span><br><span class="line">                deep = target;</span><br><span class="line">                taeget = <span class="built_in">arguments</span>[i] || &#123;&#125;;</span><br><span class="line">                i++;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">typeof</span> target !== <span class="string">"object"</span> &amp;&amp; <span class="keyword">typeof</span> target !== <span class="string">"function"</span>) &#123;</span><br><span class="line">                target = &#123;&#125;;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">//target后面没有其他参数了(要拷贝的对象)，直接扩展jQuery自身，target并入jQuery</span></span><br><span class="line">            <span class="keyword">if</span> (i === length) &#123;</span><br><span class="line">                target = <span class="keyword">this</span>;</span><br><span class="line">                i--;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">for</span> (; i &lt; length; i++) &#123;</span><br><span class="line">                <span class="keyword">if</span> ((options = <span class="built_in">arguments</span>[i]) != <span class="literal">null</span>) &#123;</span><br><span class="line">                    <span class="keyword">var</span> name, clone, copy;</span><br><span class="line">                    <span class="keyword">for</span> (name <span class="keyword">in</span> options) &#123;</span><br><span class="line">                        src = target[name]; <span class="comment">//jQuery是否已经有该属性</span></span><br><span class="line">                        copy = options[name];</span><br><span class="line">                        <span class="keyword">if</span> (target === copy) &#123;</span><br><span class="line">                            <span class="keyword">continue</span>;</span><br><span class="line">                        &#125;</span><br><span class="line">                        <span class="comment">//深拷贝，且确保被拷属性为对象/数组</span></span><br><span class="line">                        <span class="keyword">if</span> (deep &amp;&amp; copy &amp;&amp; (isObject(copy) || (copyIsArray = isArray(copy)))) &#123;</span><br><span class="line">                            <span class="comment">//被拷贝属性为数组</span></span><br><span class="line">                            <span class="keyword">if</span> (copyIsArray) &#123;</span><br><span class="line">                                copyIsArray = <span class="literal">false</span>;</span><br><span class="line">                                <span class="comment">//被合并属性</span></span><br><span class="line">                                clone = src &amp;&amp; isArray(src) ? src : [];</span><br><span class="line">                            &#125; <span class="keyword">else</span> &#123; <span class="comment">//被拷贝属性为对象</span></span><br><span class="line">                                clone = src &amp;&amp; isArray(src) ? src : &#123;&#125;;</span><br><span class="line">                            &#125;</span><br><span class="line">                            <span class="comment">//右侧递归，直到内部属性值是非对象</span></span><br><span class="line">                            target[name] = jQuery.extend(deep, clone, copy);</span><br><span class="line">                        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (copy !== <span class="literal">undefined</span>) &#123; <span class="comment">//非对象/数组，或者浅复制的情况</span></span><br><span class="line">                            target[name] = copy; <span class="comment">//递归结束</span></span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">//返回修改后的target</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> target;</span><br><span class="line"></span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">window</span>.$ = <span class="built_in">window</span>.jQuery = jQuery;</span><br><span class="line">    &#125;)();</span><br><span class="line"></span><br><span class="line">    <span class="comment">//测试</span></span><br><span class="line">    <span class="keyword">var</span> $div = $(<span class="string">'div'</span>);</span><br><span class="line">    <span class="built_in">console</span>.log($div);</span><br><span class="line">    $div.setBackground(<span class="string">'blue'</span>);</span><br><span class="line">    <span class="built_in">console</span>.log($div.jquery); <span class="comment">//0.0.1</span></span><br><span class="line">    <span class="built_in">console</span>.log($.fn.jquery); <span class="comment">//0.0.1</span></span><br><span class="line">    <span class="built_in">console</span>.log(jQuery.extend());</span><br><span class="line">    <span class="built_in">console</span>.log($.extend.jquery);</span><br><span class="line">    <span class="comment">//冲突</span></span><br><span class="line">    <span class="comment">/*var $$$ = jQuery.noConflict();</span></span><br><span class="line"><span class="comment">    $$$('div').setBackground('red');*/</span></span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">    jQuery.extend(&#123;</span><br><span class="line">        min: <span class="function"><span class="keyword">function</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> a &lt; b ? a : b;</span><br><span class="line">        &#125;,</span><br><span class="line">        max: <span class="function"><span class="keyword">function</span>(<span class="params">a, b</span>) </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> a &gt; b ? a : b;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="built_in">console</span>.info(jQuery.prototype);</span><br><span class="line">    <span class="built_in">console</span>.info(jQuery);</span><br><span class="line">    <span class="comment">// console.log($().min(3,5));</span></span><br><span class="line">    <span class="comment">// console.log($.prototype.min(3, 5));</span></span><br><span class="line">    <span class="built_in">console</span>.log($.min(<span class="number">3</span>, <span class="number">5</span>));</span><br></pre></td></tr></table></figure>
+<p>参考阅读：</p>
+<ul>
+<li><a href="http://mp.weixin.qq.com/s?__biz=MzAxODE2MjM1MA==&amp;mid=2651551118&amp;idx=1&amp;sn=be4df567418db97c9b3d8a7ab5314e01&amp;scene=1&amp;srcid=0810SD0bcpyNFVUcmgsy5kh7#rd" target="_blank" rel="noopener">从零开始，DIY一个jQuery（1）</a></li>
+<li><a href="http://mp.weixin.qq.com/s?__biz=MzAxODE2MjM1MA==&amp;mid=2651551123&amp;idx=2&amp;sn=26ddfeb73928eded3a63f05ca5273d66&amp;scene=1&amp;srcid=0811ZOMbQiHHtIIHRBceFbp7#rd" target="_blank" rel="noopener">从零开始，DIY一个jQuery（2）</a></li>
+<li><a href="http://mp.weixin.qq.com/s?__biz=MzAxODE2MjM1MA==&amp;mid=2651551144&amp;idx=2&amp;sn=78d8eec17bcdfa5bf51b5ec14c15c474&amp;scene=1&amp;srcid=0817O7pEiReCTSKGByB8SSIq#rd" target="_blank" rel="noopener">从零开始，DIY一个jQuery（3）</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/FE/" rel="tag"># FE</a>
+          
+            <a href="/tags/jQuery/" rel="tag"># jQuery</a>
+          
+            <a href="/tags/js原生实现库/" rel="tag"># js原生实现库</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/09/28/openlayers 3实践与原理探究2/" rel="next" title="OpenLayers 3实践与原理探究2-ol3基础入门案例">
+                <i class="fa fa-chevron-left"></i> OpenLayers 3实践与原理探究2-ol3基础入门案例
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/10/02/rollup+es6最佳实践/" rel="prev" title="rollup + es6最佳实践">
+                rollup + es6最佳实践 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ruyi Zhao</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">70</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">52</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-实现一个基本的框架"><span class="nav-number">1.</span> <span class="nav-text">1.实现一个基本的框架</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-整体"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 整体</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-冲突处理"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 冲突处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-extend-fn-extend-来扩展静态方法和原型方法"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 $.extend / $.fn.extend 来扩展静态方法和原型方法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-全部代码"><span class="nav-number">2.</span> <span class="nav-text">2.全部代码</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ruyi Zhao</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="第一篇文章介绍了使用原生的PHP和PHP的扩展库实现了爬虫技术。本文尝试使用PHP爬虫框架来写，首先对三种爬虫技术phpQuery，PHPcrawer， snoopy进行对比，然后分析模拟浏览器行为的方式，重点介绍下snoopy  所有代码挂在我的github上  1.几种常用的PHP爬虫框架对比1.1 phpQuery优势：类似jquery的强大搜索DOM的能力。pq()是一个功能强大的搜索DO">
+<meta name="keywords" content="爬虫,PHP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PHP爬虫最全总结2-phpQuery，PHPcrawer，snoopy框架中文介绍">
+<meta property="og:url" content="https://zrysmt.github.io/2016/10/13/PHP爬虫最全总结2-phpQuery，PHPcrawer，snoopy框架中文介绍/index.html">
+<meta property="og:site_name" content="漫漫技术路">
+<meta property="og:description" content="第一篇文章介绍了使用原生的PHP和PHP的扩展库实现了爬虫技术。本文尝试使用PHP爬虫框架来写，首先对三种爬虫技术phpQuery，PHPcrawer， snoopy进行对比，然后分析模拟浏览器行为的方式，重点介绍下snoopy  所有代码挂在我的github上  1.几种常用的PHP爬虫框架对比1.1 phpQuery优势：类似jquery的强大搜索DOM的能力。pq()是一个功能强大的搜索DO">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-11-30T03:01:38.816Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PHP爬虫最全总结2-phpQuery，PHPcrawer，snoopy框架中文介绍">
+<meta name="twitter:description" content="第一篇文章介绍了使用原生的PHP和PHP的扩展库实现了爬虫技术。本文尝试使用PHP爬虫框架来写，首先对三种爬虫技术phpQuery，PHPcrawer， snoopy进行对比，然后分析模拟浏览器行为的方式，重点介绍下snoopy  所有代码挂在我的github上  1.几种常用的PHP爬虫框架对比1.1 phpQuery优势：类似jquery的强大搜索DOM的能力。pq()是一个功能强大的搜索DO">
+
+
+
+
+
+
+  <link rel="canonical" href="https://zrysmt.github.io/2016/10/13/PHP爬虫最全总结2-phpQuery，PHPcrawer，snoopy框架中文介绍/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>PHP爬虫最全总结2-phpQuery，PHPcrawer，snoopy框架中文介绍 | 漫漫技术路</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">漫漫技术路</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://zrysmt.github.io/2016/10/13/PHP爬虫最全总结2-phpQuery，PHPcrawer，snoopy框架中文介绍/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Ruyi Zhao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="漫漫技术路">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">PHP爬虫最全总结2-phpQuery，PHPcrawer，snoopy框架中文介绍
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2016-10-13 00:00:00" itemprop="dateCreated datePublished" datetime="2016-10-13T00:00:00+08:00">2016-10-13</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-11-30 11:01:38" itemprop="dateModified" datetime="2018-11-30T11:01:38+08:00">2018-11-30</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/PHP/" itemprop="url" rel="index"><span itemprop="name">PHP</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>第一篇文章介绍了使用原生的PHP和PHP的扩展库实现了爬虫技术。本文尝试使用PHP爬虫框架来写，首先对三种爬虫技术<a href="https://github.com/punkave/phpQuery" target="_blank" rel="noopener">phpQuery</a>，<a href="http://phpcrawl.cuab.de/" target="_blank" rel="noopener">PHPcrawer</a>， snoopy进行对比，然后分析模拟浏览器行为的方式，重点介绍下snoopy</p>
+<blockquote>
+<p>所有代码挂在我的<a href="https://github.com/zrysmt/PHPSpider" target="_blank" rel="noopener">github</a>上</p>
+</blockquote>
+<h1 id="1-几种常用的PHP爬虫框架对比"><a href="#1-几种常用的PHP爬虫框架对比" class="headerlink" title="1.几种常用的PHP爬虫框架对比"></a>1.几种常用的PHP爬虫框架对比</h1><h2 id="1-1-phpQuery"><a href="#1-1-phpQuery" class="headerlink" title="1.1 phpQuery"></a>1.1 <a href="https://github.com/punkave/phpQuery" target="_blank" rel="noopener">phpQuery</a></h2><p><strong>优势：</strong>类似jquery的强大搜索DOM的能力。<br>pq()是一个功能强大的搜索DOM的方法，跟jQuery的$()如出一辙，jQuery的选择器基本上都能使用在phpQuery上，只要把“.”变成“-&gt;”,Demo如下(对应我的github的Demo5)</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> </span><br><span class="line"> <span class="keyword">require</span>(<span class="string">'phpQuery/phpQuery.php'</span>);</span><br><span class="line"> phpQuery::newDocumentFile(<span class="string">'http://www.baidu.com/'</span>); </span><br><span class="line"> $menu_a = pq(<span class="string">"a"</span>); </span><br><span class="line"> <span class="keyword">foreach</span>($menu_a <span class="keyword">as</span> $a)&#123;</span><br><span class="line">    <span class="keyword">echo</span> pq($a)-&gt;html().<span class="string">"&lt;br&gt;"</span>;</span><br><span class="line"> &#125; </span><br><span class="line"> <span class="keyword">foreach</span>($menu_a <span class="keyword">as</span> $a)&#123;</span><br><span class="line">    <span class="keyword">echo</span> pq($a)-&gt;attr(<span class="string">"href"</span>).<span class="string">"&lt;br&gt;"</span>;</span><br><span class="line"> &#125; </span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<h2 id="1-2-PHPcrawer"><a href="#1-2-PHPcrawer" class="headerlink" title="1.2 PHPcrawer"></a>1.2 <a href="http://phpcrawl.cuab.de/" target="_blank" rel="noopener">PHPcrawer</a></h2><p><strong>优势：</strong>过滤能力比较强。<br>官方给的Demo如下（我的github中对应demo4）：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> </span><br><span class="line">    <span class="keyword">include</span>(<span class="string">"PHPCrawl/libs/PHPCrawler.class.php"</span>);</span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">MyCrawler</span> <span class="keyword">extends</span> <span class="title">PHPCrawler</span> </span></span><br><span class="line"><span class="class">    </span>&#123; </span><br><span class="line">      <span class="function"><span class="keyword">function</span> <span class="title">handleDocumentInfo</span><span class="params">(PHPCrawlerDocumentInfo $PageInfo)</span> </span></span><br><span class="line"><span class="function">      </span>&#123; <span class="comment">// As example we just print out the URL of the document </span></span><br><span class="line">        <span class="keyword">echo</span> $PageInfo-&gt;url.<span class="string">"&lt;br&gt;"</span>; </span><br><span class="line">      &#125; </span><br><span class="line">    &#125;</span><br><span class="line">    $crawler = <span class="keyword">new</span> MyCrawler(); </span><br><span class="line">    $crawler-&gt;setURL(<span class="string">"www.baidu.com"</span>); </span><br><span class="line">    $crawler-&gt;addURLFilterRule(<span class="string">"#\.(jpg|gif)$# i"</span>);</span><br><span class="line">    <span class="comment">//过滤到含有这些图片格式的URL</span></span><br><span class="line">    $crawler-&gt;go();</span><br><span class="line"> <span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<h2 id="1-3-snoopy"><a href="#1-3-snoopy" class="headerlink" title="1.3 snoopy"></a>1.3 snoopy</h2><p><strong>优势：</strong>提交表单，设置代理等<br>Snoopy是一个php类，用来模拟浏览器的功能，可以获取网页内容，发送表单，<br>demo如下（对应github中的demo3）：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">include</span> <span class="string">'Snoopy/Snoopy.class.php'</span>;</span><br><span class="line">$snoopy = <span class="keyword">new</span> Snoopy();</span><br><span class="line">$url = <span class="string">"http://www.baidu.com"</span>;</span><br><span class="line"><span class="comment">// $snoopy-&gt;fetch($url);</span></span><br><span class="line"><span class="comment">// $snoopy-&gt;fetchtext($url);//去除HTML标签和其他的无关数据</span></span><br><span class="line">$snoopy-&gt;fetchform($url);<span class="comment">//只获取表单</span></span><br><span class="line"><span class="comment">//只返回网页中链接 默认情况下，相对链接将自动补全，转换成完整的URL。</span></span><br><span class="line"><span class="comment">// $snoopy-&gt;fetchlinks($url);</span></span><br><span class="line">var_dump($snoopy-&gt;results);</span><br></pre></td></tr></table></figure>
+<h2 id="1-4-phpspider"><a href="#1-4-phpspider" class="headerlink" title="1.4 phpspider"></a>1.4 <a href="http://www.sphider.eu/" target="_blank" rel="noopener">phpspider</a></h2><p><strong>优势：</strong>安装配置到数据库<br>提供了安装配置，能够直接连接mysql数据库，使用也是比较广泛，这里我们暂时不单独介绍。</p>
+<h1 id="2-模拟用户行为"><a href="#2-模拟用户行为" class="headerlink" title="2.模拟用户行为"></a>2.模拟用户行为</h1><h2 id="2-1-file-get-contents"><a href="#2-1-file-get-contents" class="headerlink" title="2.1 file_get_contents"></a>2.1 file_get_contents</h2><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$opts = <span class="keyword">array</span>(</span><br><span class="line">  <span class="string">'http'</span>=&gt;<span class="keyword">array</span>(</span><br><span class="line">    <span class="string">'method'</span>=&gt;<span class="string">"GET"</span>,</span><br><span class="line">    <span class="string">'header'</span>=&gt;<span class="string">"Accept-language: en\r\n"</span> .</span><br><span class="line">              <span class="string">"Cookie: foo=bar\r\n"</span></span><br><span class="line">  )</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">$context = stream_context_create($opts);</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Sends an http request to www.example.com</span></span><br><span class="line"><span class="comment">   with additional headers shown above */</span></span><br><span class="line">$fp = fopen(<span class="string">'http://www.example.com'</span>, <span class="string">'r'</span>, <span class="keyword">false</span>, $context);</span><br><span class="line">fpassthru($fp);</span><br><span class="line">fclose($fp);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<h2 id="2-2-curl"><a href="#2-2-curl" class="headerlink" title="2.2 curl"></a>2.2 curl</h2><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ch=curl_init();  <span class="comment">//初始化一个cURL会话</span></span><br><span class="line">curl_setopt($ch,CURLOPT_URL,$url);<span class="comment">//设置需要获取的 URL 地址</span></span><br><span class="line"><span class="comment">// 设置浏览器的特定header</span></span><br><span class="line">curl_setopt($ch, CURLOPT_HTTPHEADER, <span class="keyword">array</span>(</span><br><span class="line">  <span class="string">"Host: www.baidu.com"</span>,</span><br><span class="line">  <span class="string">"Connection: keep-alive"</span>,</span><br><span class="line">  <span class="string">"Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"</span>,</span><br><span class="line">  <span class="string">"Upgrade-Insecure-Requests: 1"</span>,</span><br><span class="line">  <span class="string">"DNT:1"</span>,</span><br><span class="line">  <span class="string">"Accept-Language: zh-CN,zh;q=0.8,en-GB;q=0.6,en;q=0.4,en-US;q=0.2"</span>,</span><br><span class="line">  <span class="string">"Cookie:_za=4540d427-eee1-435a-a533-66ecd8676d7d;"</span>    </span><br><span class="line">));</span><br><span class="line">$result=curl_exec($ch);<span class="comment">//执行一个cURL会话</span></span><br></pre></td></tr></table></figure>
+<h2 id="2-3-snoopy"><a href="#2-3-snoopy" class="headerlink" title="2.3 snoopy"></a>2.3 snoopy</h2><ul>
+<li>表单提交</li>
+</ul>
+<p>我们的一个例子<br>form-demo.html</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">"en"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"UTF-8"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>form-demo<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">form</span> <span class="attr">action</span>=<span class="string">"./form-demo.php"</span> <span class="attr">method</span>=<span class="string">"post"</span>&gt;</span></span><br><span class="line">        用户名:<span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">name</span>=<span class="string">"userName"</span>&gt;</span><span class="tag">&lt;<span class="name">br</span>&gt;</span></span><br><span class="line">        密 码:<span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"password"</span> <span class="attr">name</span>=<span class="string">"password"</span>&gt;</span><span class="tag">&lt;<span class="name">br</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"submit"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>form-demo.php</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> </span><br><span class="line">    $userName = $_POST[<span class="string">'userName'</span>];</span><br><span class="line">    $password = $_POST[<span class="string">'password'</span>];</span><br><span class="line">    <span class="keyword">if</span>($userName===<span class="string">"admin"</span>&amp;&amp;$password===<span class="string">"admin"</span>)&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"hello admin"</span>;</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">"login error"</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> <span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>提交表单<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">include</span> <span class="string">'Snoopy/Snoopy.class.php'</span>;</span><br><span class="line">$snoopy = <span class="keyword">new</span> Snoopy();</span><br><span class="line">$formvars[<span class="string">"userName"</span>] = <span class="string">"admin"</span>;</span><br><span class="line"><span class="comment">//userName 与服务器端/表单的name属性一致</span></span><br><span class="line">$formvars[<span class="string">"password"</span>] = <span class="string">"admin"</span>;</span><br><span class="line">$action = <span class="string">"http://localhost:8000/spider/demo3/form-demo.php"</span>;<span class="comment">//表单提交地址</span></span><br><span class="line">$snoopy-&gt;submit($action,$formvars);</span><br><span class="line"><span class="keyword">echo</span> $snoopy-&gt;results;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>问题1：openssl extension required for HTTPS 增加对https的支持</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php.in ==&gt; ;extension=php_openssl.dll 去除注释</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>问题2：405 Not Allowed增加</p>
+</blockquote>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$snoopy-&gt;agent = <span class="string">"(compatible; MSIE 4.01; MSN 2.5; AOL 4.0; Windows 98)"</span>; <span class="comment">//伪装浏览器</span></span><br><span class="line">$snoopy-&gt;referer = <span class="string">"http://www.icultivator.com"</span>; <span class="comment">//伪装来源页地址 http_referer</span></span><br><span class="line">$snoopy-&gt;rawheaders[<span class="string">"Pragma"</span>] = <span class="string">"no-cache"</span>; <span class="comment">//cache 的http头信息</span></span><br><span class="line">$snoopy-&gt;rawheaders[<span class="string">"X_FORWARDED_FOR"</span>] = <span class="string">"122.0.74.166"</span>; <span class="comment">//伪装ip</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>问题3 : snoopy使用代理</p>
+</blockquote>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$snoopy-&gt;proxy_host = <span class="string">"http://www.icultivator.com"</span>;</span><br><span class="line"><span class="comment">// HTTPS connections over proxy are currently not supported</span></span><br><span class="line">$snoopy-&gt;proxy_port = <span class="string">"8080"</span>; <span class="comment">//使用代理</span></span><br><span class="line">$snoopy-&gt;maxredirs = <span class="number">2</span>; <span class="comment">//重定向次数</span></span><br><span class="line">$snoopy-&gt;expandlinks = <span class="keyword">true</span>; <span class="comment">//是否补全链接 在采集的时候经常用到</span></span><br><span class="line">$snoopy-&gt;maxframes = <span class="number">5</span>; <span class="comment">//允许的最大框架数</span></span><br></pre></td></tr></table></figure>
+<p><strong>问题：</strong><br>其实尝试了网站进行提交表单是有问题的。这样简单的处理是不能提交表单的，使用代理也是有问题<br>的。snoopy框架确实会有很多问题，后面有解决思路了再说。</p>
+<p><strong>参考阅读：</strong></p>
+<ul>
+<li><a href="https://my.oschina.net/junn/blog/147936" target="_blank" rel="noopener">cURL、file_get_contents、snoopy.class.php 优缺点</a></li>
+<li><a href="http://www.oschina.net/project/lang/22?tag=64&amp;show=news" target="_blank" rel="noopener">开源中国-PHP爬虫框架列表</a></li>
+<li><a href="http://blog.johnsonlu.org/phpphpquery/" target="_blank" rel="noopener">phpQuery</a></li>
+<li><a href="https://sourceforge.net/projects/snoopy/" target="_blank" rel="noopener">Snoopy下载地址</a></li>
+<li><a href="http://www.thinksaas.cn/topics/0/558/558466.html" target="_blank" rel="noopener">Snoopy —— 强大的PHP采集类使用详解及示例：采集、模拟登录及伪装浏览器</a></li>
+<li><a href="https://www.oschina.net/search?scope=blog&amp;q=Snoopy" target="_blank" rel="noopener">开源中国-snoopy博客列表</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/爬虫/" rel="tag"># 爬虫</a>
+          
+            <a href="/tags/PHP/" rel="tag"># PHP</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/11/前端自动化测试工具--使用karma进行javascript单元测试/" rel="next" title="前端自动化测试工具--使用karma进行javascript单元测试">
+                <i class="fa fa-chevron-left"></i> 前端自动化测试工具--使用karma进行javascript单元测试
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/10/26/动手DIY一个underscorejs库及underscorejs源码分析1/" rel="prev" title="动手DIY一个underscorejs库及underscorejs源码分析1">
+                动手DIY一个underscorejs库及underscorejs源码分析1 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Ruyi Zhao</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">70</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">52</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-几种常用的PHP爬虫框架对比"><span class="nav-number">1.</span> <span class="nav-text">1.几种常用的PHP爬虫框架对比</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-phpQuery"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 phpQuery</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-PHPcrawer"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 PHPcrawer</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-snoopy"><span class="nav-number">1.3.</span> <span class="nav-text">1.3 snoopy</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-4-phpspider"><span class="nav-number">1.4.</span> <span class="nav-text">1.4 phpspider</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-模拟用户行为"><span class="nav-number">2.</span> <span class="nav-text">2.模拟用户行为</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-file-get-contents"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 file_get_contents</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-curl"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 curl</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-snoopy"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 snoopy</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Ruyi Zhao</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.5.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
